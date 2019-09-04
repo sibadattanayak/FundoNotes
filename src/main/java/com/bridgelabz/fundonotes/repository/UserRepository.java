@@ -1,5 +1,9 @@
 package com.bridgelabz.fundonotes.repository;
 
-public class UserRepository {
+import com.bridgelabz.fundonotes.dto.ValidateUser;
 
+public class UserRepository {
+public void registerNewUser(ValidateUser validateUser) {
+	
+}
 }

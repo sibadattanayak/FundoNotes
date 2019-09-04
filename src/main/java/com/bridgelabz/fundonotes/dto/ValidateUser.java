@@ -5,12 +5,14 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Configuration;
 
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.util.Utility;
 
 import net.minidev.json.annotate.JsonIgnore;
 
+@Configuration
 public class ValidateUser {
 	Utility util = new Utility();
 	UserDetails user = new UserDetails();

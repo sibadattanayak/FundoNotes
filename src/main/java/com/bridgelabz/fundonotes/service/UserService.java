@@ -1,13 +1,15 @@
 package com.bridgelabz.fundonotes.service;
 
-import com.bridgelabz.fundonotes.model.UserDetails;
+import java.util.List;
+
+import com.bridgelabz.fundonotes.dto.ValidateUser;
 
 public interface UserService {
 
-	abstract int userRegistration(UserDetails userDetails);
+	abstract void userRegistration(ValidateUser validateUser);
 
-	abstract int userLogin(UserDetails userDetails);
+	abstract List<ValidateUser> userLogin(ValidateUser validateUser);
 
-	abstract int userForgotPassword(UserDetails userDetails);
+	abstract int userForgotPassword(ValidateUser validateUser);
 
 }

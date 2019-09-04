@@ -1,22 +1,35 @@
 package com.bridgelabz.fundonotes.serviceimpl;
 
-import com.bridgelabz.fundonotes.model.UserDetails;
+import java.util.List;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bridgelabz.fundonotes.dto.ValidateUser;
+import com.bridgelabz.fundonotes.repository.UserRepository;
 import com.bridgelabz.fundonotes.service.UserService;
 
+@Service
 public class UserServiceImpl implements UserService {
 
+	UserRepository userRepository;
 	@Override
-	public int userRegistration(UserDetails userDetails) {
-		return 0;
+	@Transactional
+	public void userRegistration(ValidateUser validateUser) {
+		 userRepository.registerNewUser(validateUser);
+
 	}
 
 	@Override
-	public int userLogin(UserDetails userDetails) {
-		return 0;
+	@Transactional
+	public List<ValidateUser> userLogin(ValidateUser validateUser) {
+		return null;
 	}
 
 	@Override
-	public int userForgotPassword(UserDetails userDetails) {
+	@Transactional
+	public int userForgotPassword(ValidateUser validateUser) {
 		return 0;
 	}
 
