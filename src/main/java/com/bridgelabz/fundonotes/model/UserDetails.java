@@ -2,6 +2,7 @@ package com.bridgelabz.fundonotes.model;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -35,25 +36,25 @@ public class UserDetails {
 	@Column(name = "User_Password")
 	private String password;
 	@Column(name = "User_PasswordCreationTime")
-	private Date createTime;
+	private LocalDateTime createTime;
 	@Column(name = "User_PasswordUpdationTime")
-	private Date updateTime;
+	private LocalDateTime updateTime;
 	@Column(name = "User_isVarified")
 	private boolean isVarified;
 
-	public Date getUpdateTime() {
+	public LocalDateTime getUpdateTime() {
 		return updateTime;
 	}
 
-	public void setUpdateTime(Date updateTime) {
+	public void setUpdateTime(LocalDateTime updateTime) {
 		this.updateTime = updateTime;
 	}
 
-	public Date getCreateTime() {
+	public LocalDateTime getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(LocalDateTime createTime) {
 		this.createTime = createTime;
 	}
 

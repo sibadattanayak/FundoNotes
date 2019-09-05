@@ -3,7 +3,22 @@ package com.bridgelabz.fundonotes.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+
+@Component
 public class Utility {
+
+	private static final String SECRET = null;
+	@Autowired
+	private JavaMailSender mailSender;
 
 	public boolean isValidPassword(String password) {
 		int length = password.trim().length();
@@ -41,4 +56,44 @@ public class Utility {
 			return false;
 	}
 
+	public String jwtToken(Integer userId) {
+		String token = null;
+		try {
+			token = JWT.create().withClaim("userId", userId)
+
+					// .withSubject(((User) auth.getPrincipal()).getUsername())
+					// .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+					.sign(Algorithm.HMAC512(SECRET));
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+		return token;
+	}
+
+	public Integer jwtTokenParser(String token) {
+		Integer user = 0;
+		// String token = request.getHeader(HEADER_STRING);
+		if (token != null) {
+			user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build().verify(token).getClaim("userId").asInt();
+
+		}
+		return user;
+	}
+
+	public void javaMail(String to, String token, String url) {
+
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message);
+			helper.setFrom("sibadattanayak1996@gmail.com");
+			helper.setTo(to);
+			helper.setText(url + token);
+			helper.setSubject("IsVerified Token");
+			mailSender.send(message);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 }

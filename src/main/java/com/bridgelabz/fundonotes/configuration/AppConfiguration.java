@@ -1,5 +1,7 @@
 package com.bridgelabz.fundonotes.configuration;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration.AccessLevel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +14,13 @@ public class AppConfiguration implements WebMvcConfigurer {
 	public BCryptPasswordEncoder passwordEncoder() {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		return bCryptPasswordEncoder;
+	}
+
+	@Bean
+	public ModelMapper getModelMapping() {
+		ModelMapper modelMapper = new ModelMapper();
+	    modelMapper.getConfiguration().setMethodAccessLevel(AccessLevel.PROTECTED);
+		return modelMapper;
 	}
 
 }

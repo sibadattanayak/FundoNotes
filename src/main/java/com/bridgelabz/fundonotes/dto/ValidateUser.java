@@ -5,14 +5,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Configuration;
 
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.util.Utility;
 
 import net.minidev.json.annotate.JsonIgnore;
 
-@Configuration
 public class ValidateUser {
 	Utility util = new Utility();
 	UserDetails user = new UserDetails();
@@ -26,7 +24,6 @@ public class ValidateUser {
 	@NotEmpty(message = "Please provide your email")
 	private String email;
 
-	@JsonIgnore
 	@NotEmpty(message = "Please provide your password")
 	@Size(min = 3, max = 10, message = "Your password must have at least 3-10 characters")
 	private String password;
@@ -66,8 +63,5 @@ public class ValidateUser {
 		if (util.isValidPassword(password))
 			this.password = password;
 	}
-
-	ModelMapper modelMapper = new ModelMapper();
-	ValidateUser userDTO = modelMapper.map(user, ValidateUser.class);
 
 }
