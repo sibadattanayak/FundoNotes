@@ -16,11 +16,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 @Component
 public class Utility {
 
-	private static final String SECRET = null;
+	private static final String SECRET = "abcdjdtgfkjsbddkjsgfb";
 	@Autowired
 	private JavaMailSender mailSender;
 
-	public boolean isValidPassword(String password) {
+	public String isValidPassword(String password) {
 		int length = password.trim().length();
 		int digit = 0;
 		int lowerCase = 0;
@@ -51,19 +51,15 @@ public class Utility {
 			}
 		}
 		if (digit >= 1 && lowerCase >= 1 && upperCase >= 1 && specialChar >= 1)
-			return true;
+			return "Strength is strong";
 		else
-			return false;
+			return "Strength is low";
 	}
 
 	public String jwtToken(Integer userId) {
 		String token = null;
 		try {
-			token = JWT.create().withClaim("userId", userId)
-
-					// .withSubject(((User) auth.getPrincipal()).getUsername())
-					// .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-					.sign(Algorithm.HMAC512(SECRET));
+			token = JWT.create().withClaim("userId", userId).sign(Algorithm.HMAC512(SECRET));
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		}
@@ -72,10 +68,8 @@ public class Utility {
 
 	public Integer jwtTokenParser(String token) {
 		Integer user = 0;
-		// String token = request.getHeader(HEADER_STRING);
 		if (token != null) {
-			user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build().verify(token).getClaim("userId").asInt();
-
+			user = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getClaim("userId").asInt();
 		}
 		return user;
 	}

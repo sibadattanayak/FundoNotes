@@ -53,15 +53,13 @@ public class ValidateUser {
 	}
 
 	public String getPassword() {
-		if (util.isValidPassword(password))
-			return password;
-		else
-			return "Invalid password";
+		return password;
 	}
 
 	public void setPassword(String password) {
-		if (util.isValidPassword(password))
-			this.password = password;
+		this.password = password;
 	}
+
+	
 
 }
