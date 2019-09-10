@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundonotes.dto.ForgotPasswordDTO;
 import com.bridgelabz.fundonotes.dto.LoginDTO;
+import com.bridgelabz.fundonotes.dto.NoteDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
 import com.bridgelabz.fundonotes.serviceimpl.UserServiceImpl;
 
@@ -29,24 +31,49 @@ public class UserController {
 
 	@PostMapping("/registration")
 	public String registration(@RequestBody ValidateUser validateUser) {
-		String token = userServiceImpl.userRegistration(validateUser);
-		return token;
+		return userServiceImpl.userRegistration(validateUser);
 	}
 
 	@GetMapping("/forgotpassword")
 	public String userForgotPassword(@RequestHeader String email) {
 		return userServiceImpl.userForgotPassword(email);
-		
 	}
+
 	@PutMapping("/resetpassword/{password}")
 	public String userResetPassword(@RequestBody ForgotPasswordDTO password, @RequestHeader String token) {
-		return userServiceImpl.userResetPassword(password,token);
-		 
+		return userServiceImpl.userResetPassword(password, token);
 	}
 
-
-	@GetMapping(value = "/verifyuser/{token}")
+	@PutMapping(value = "/verifyuser/{token}")
 	public void varifyUser(@PathVariable String token) {
 		userServiceImpl.updateRegistration(token);
+	}
+
+	@PostMapping("/createnote")
+	public void createNote(@RequestBody NoteDTO validNote) {
+	}
+
+	@PutMapping("/updatenote/{data}")
+	public void updateNote(@RequestBody NoteDTO validNote) {
+	}
+
+	@DeleteMapping("/deletenote")
+	public void deleteNote(@RequestBody NoteDTO validNote) {
+	}
+
+	@GetMapping("/userlist")
+	public void userList(@RequestBody String userNames) {
+	}
+
+	@GetMapping("/notelist")
+	public void noteList(@RequestBody String userNoteList) {
+	}
+
+	@GetMapping("/labellist")
+	public void labelList(@RequestBody String noteLabelList) {
+	}
+
+	@GetMapping("/colabratorlist")
+	public void colabratorList(@RequestBody String noteColabratorList) {
 	}
 }

@@ -1,9 +1,6 @@
 package com.bridgelabz.fundonotes.model;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,12 +17,10 @@ import net.minidev.json.annotate.JsonIgnore;
 @Table(name = "User_Details")
 public class UserDetails {
 
-	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "User_Id")
-	private int id;
+	private int userId;
 	@Column(name = "User_FirstName")
 	private String firstName;
 	@Column(name = "User_LastName")
@@ -74,12 +69,12 @@ public class UserDetails {
 		this.password = password;
 	}
 
-	public int getId() {
-		return id;
+	public int getUserId() {
+		return userId;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setId(int userId) {
+		this.userId = userId;
 	}
 
 	public String getFirstName() {

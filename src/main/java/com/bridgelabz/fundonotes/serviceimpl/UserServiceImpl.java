@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.serviceimpl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bridgelabz.fundonotes.dto.ForgotPasswordDTO;
 import com.bridgelabz.fundonotes.dto.LoginDTO;
+import com.bridgelabz.fundonotes.dto.NoteDTO;
+import com.bridgelabz.fundonotes.dto.NoteLabelDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.repository.UserRepository;
@@ -35,12 +38,12 @@ public class UserServiceImpl implements UserService {
 		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
 		userDetails.setCreateTime(LocalDateTime.now());
 		userDetails.setUpdateTime(LocalDateTime.now());
-		userDetails.setVarified(true);
+		userDetails.setVarified(false);
 		userRepository.save(userDetails);
-		String token = util.jwtToken(userDetails.getId());
+		String token = null;
 		if (userDetails != null) {
-			token = util.jwtToken(userDetails.getId());
-			String url = "http://localhost:8082/fundonote/verifyuser";
+			token = util.jwtToken(userDetails.getUserId());
+			String url = "http://localhost:8082/fundonote/verifyuser/";
 			util.javaMail(userDetails.getEmail(), token, url);
 		}
 		return token;
@@ -51,15 +54,11 @@ public class UserServiceImpl implements UserService {
 	public String userLogin(LoginDTO loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userRepository.findByEmail(loginDto.getUserEmail());
-		if (userDetails.isPresent()) {
-			if (userDetails.get().isVarified() == true
-					&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
-				token = util.jwtToken(userDetails.get().getId());
-			}
-			return token;
-		} else {
-			return "BadCredentials!!!";
+		if (userDetails.isPresent() && userDetails.get().isVarified() == true
+				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
+			token = util.jwtToken(userDetails.get().getUserId());
 		}
+		return token;
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
 		LoginDTO loginDto = null;
 		Optional<UserDetails> userDetails = userRepository.findByEmail(loginDto.getUserEmail());
 		if (userDetails.isPresent()) {
-			String token = util.jwtToken(userDetails.get().getId());
+			String token = util.jwtToken(userDetails.get().getUserId());
 			util.javaMail(userDetails.get().getEmail(), token, "");
 		}
 		return "Sent to email";
@@ -108,4 +107,38 @@ public class UserServiceImpl implements UserService {
 		return message;
 	}
 
+	@Override
+	public List<ValidateUser> showUserList(ValidateUser validateUser) {
+		return null;
+	}
+
+	@Override
+	public List<NoteDTO> showNoteList(NoteDTO validateNote) {
+		return null;
+	}
+
+	@Override
+	public List<NoteLabelDTO> showNoteLabelList(NoteLabelDTO validateNoteLabel) {
+		return null;
+	}
+
+	@Override
+	public List<ValidateUser> showNoteColabratorList(ValidateUser validateUser) {
+		return null;
+	}
+
+	@Override
+	public String createNote(NoteDTO validateNote) {
+		return null;
+	}
+
+	@Override
+	public String updateNote(NoteDTO validateNote) {
+		return null;
+	}
+
+	@Override
+	public String deleteNote(NoteDTO validateNote) {
+		return null;
+	}
 }

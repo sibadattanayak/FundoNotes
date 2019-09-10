@@ -3,11 +3,9 @@ package com.bridgelabz.fundonotes.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -16,7 +14,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 @Component
 public class Utility {
 
-	private static final String SECRET = "abcdjdtgfkjsbddkjsgfb";
+	private static final String SECRET = "abcdefghijklmnopqrstuvwxyzABCSEFGHIJKLMNOPQRSTUVWXYZ1234567890 ";
+
 	@Autowired
 	private JavaMailSender mailSender;
 
@@ -77,12 +76,11 @@ public class Utility {
 	public void javaMail(String to, String token, String url) {
 
 		try {
-			MimeMessage message = mailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
-			helper.setFrom("sibadattanayak1996@gmail.com");
-			helper.setTo(to);
-			helper.setText(url + token);
-			helper.setSubject("IsVerified Token");
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setFrom("sibadattanayak1996@gmail.com");
+			message.setTo(to);
+			message.setText(url + token);
+			message.setSubject("IsVerified Token");
 			mailSender.send(message);
 
 		} catch (Exception e) {

@@ -19,7 +19,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Bean
 	public ModelMapper getModelMapping() {
 		ModelMapper modelMapper = new ModelMapper();
-	    modelMapper.getConfiguration().setMethodAccessLevel(AccessLevel.PROTECTED);
+		modelMapper.getConfiguration().setMethodAccessLevel(AccessLevel.PROTECTED);
 		return modelMapper;
 	}
 
