@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,11 +19,12 @@ import com.bridgelabz.fundonotes.dto.NoteLabelDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.repository.UserRepository;
+import com.bridgelabz.fundonotes.service.UserNoteLabelService;
 import com.bridgelabz.fundonotes.service.UserService;
 import com.bridgelabz.fundonotes.util.Utility;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserNoteLabelService {
 	@Autowired
 	UserRepository userRepository;
 	@Autowired
@@ -30,6 +33,12 @@ public class UserServiceImpl implements UserService {
 	Utility util;
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	private static Logger logger = Logger.getLogger(UserServiceImpl.class);
+	static {
+		PropertyConfigurator
+				.configure("/home/admin1/Desktop/SpringWorkspace/FundoNotes/src/main/resources/log4j.properties");
+	}
 
 	@Override
 	@Transactional
@@ -46,6 +55,7 @@ public class UserServiceImpl implements UserService {
 			String url = "http://localhost:8082/fundonote/verifyuser/";
 			util.javaMail(userDetails.getEmail(), token, url);
 		}
+		logger.info("user registration");
 		return token;
 	}
 
@@ -109,36 +119,25 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<ValidateUser> showUserList(ValidateUser validateUser) {
-		return null;
-	}
-
-	@Override
-	public List<NoteDTO> showNoteList(NoteDTO validateNote) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<NoteLabelDTO> showNoteLabelList(NoteLabelDTO validateNoteLabel) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ValidateUser> showNoteColabratorList(ValidateUser validateUser) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public String createNote(NoteDTO validateNote) {
-		return null;
+	public void createNote(NoteDTO validNote) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	@Override
-	public String updateNote(NoteDTO validateNote) {
-		return null;
-	}
-
-	@Override
-	public String deleteNote(NoteDTO validateNote) {
-		return null;
-	}
 }

@@ -15,6 +15,7 @@ import com.bridgelabz.fundonotes.dto.ForgotPasswordDTO;
 import com.bridgelabz.fundonotes.dto.LoginDTO;
 import com.bridgelabz.fundonotes.dto.NoteDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
+import com.bridgelabz.fundonotes.model.UserNotes;
 import com.bridgelabz.fundonotes.serviceimpl.UserServiceImpl;
 
 @RestController
@@ -51,9 +52,11 @@ public class UserController {
 
 	@PostMapping("/createnote")
 	public void createNote(@RequestBody NoteDTO validNote) {
+
+		userServiceImpl.createNote(validNote);
 	}
 
-	@PutMapping("/updatenote/{data}")
+	@PutMapping("/updatenote/{data}") 
 	public void updateNote(@RequestBody NoteDTO validNote) {
 	}
 
