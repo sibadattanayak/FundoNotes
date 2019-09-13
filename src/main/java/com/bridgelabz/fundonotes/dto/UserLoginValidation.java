@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonotes.dto;
 
-public class LoginDTO {
+public class UserLoginValidation {
 	private String userEmail;
 	private String userPassword;
 

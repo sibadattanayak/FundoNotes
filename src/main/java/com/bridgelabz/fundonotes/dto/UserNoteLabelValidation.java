@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonotes.dto;
 
-public class NoteLabelDTO {
+public class UserNoteLabelValidation {
 
 	private int userId;
 	private int labelId;

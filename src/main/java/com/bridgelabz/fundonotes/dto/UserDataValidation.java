@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.util.Utility;
 
-public class ValidateUser {
+public class UserDataValidation {
 	Utility util = new Utility();
 	UserDetails user = new UserDetails();
 

@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonotes.dto;
 
-public class ForgotPasswordDTO {
+public class UserForgotPasswordValidation {
 	private String password;
 	private String conformPassword;
 

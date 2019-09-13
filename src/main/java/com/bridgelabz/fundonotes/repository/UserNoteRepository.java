@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.model.UserNotes;
 
-public interface UserRepository extends JpaRepository<UserDetails, Integer> {
+public interface UserNoteRepository extends JpaRepository<UserNotes, Long> {
 
-	Optional<UserDetails> findByEmail(String email);
+	//@Query("FROM UserNotes WHERE noteId = ?1")
+	Optional<UserNotes> findByNoteId(Long noteId);
 
-	@Query("email from userDetails where id=?1")
-	Optional<UserNotes> findByNoteId(int noteId);
+	//@Query("FROM UserNotes WHERE noteId = ?1")
+	Optional<UserNotes> deleteByNoteId(Long noteId);
 
 }

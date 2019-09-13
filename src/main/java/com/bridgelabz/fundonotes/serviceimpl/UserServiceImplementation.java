@@ -12,25 +12,25 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bridgelabz.fundonotes.dto.ForgotPasswordDTO;
-import com.bridgelabz.fundonotes.dto.LoginDTO;
-import com.bridgelabz.fundonotes.dto.NoteDTO;
-import com.bridgelabz.fundonotes.dto.NoteLabelDTO;
-import com.bridgelabz.fundonotes.dto.ValidateUser;
+import com.bridgelabz.fundonotes.dto.UserDataValidation;
+import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
+import com.bridgelabz.fundonotes.dto.UserLoginValidation;
+import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
+import com.bridgelabz.fundonotes.dto.UserNoteValidation;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.model.UserNotes;
-import com.bridgelabz.fundonotes.repository.UserNotesRepository;
-import com.bridgelabz.fundonotes.repository.UserRepository;
-import com.bridgelabz.fundonotes.service.UserNoteLabelService;
-import com.bridgelabz.fundonotes.service.UserNoteService;
-import com.bridgelabz.fundonotes.service.UserService;
+import com.bridgelabz.fundonotes.repository.UserDataRepository;
+import com.bridgelabz.fundonotes.repository.UserNoteRepository;
+import com.bridgelabz.fundonotes.service.Label;
+import com.bridgelabz.fundonotes.service.Note;
+import com.bridgelabz.fundonotes.service.User;
 import com.bridgelabz.fundonotes.util.Utility;
 
 @Service
-public class UserServiceImpl implements UserService, UserNoteLabelService, UserNoteService {
+public class UserServiceImplementation implements User, Label, Note {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserDataRepository userDataRepository;
 	@Autowired
 	private ModelMapper modelMapper;
 	@Autowired
@@ -40,9 +40,9 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 	@Autowired
 	private UserDetails userDetails;
 	@Autowired
-	private UserNotesRepository userNotesRepository;
+	private UserNoteRepository userNoteRepository;
 
-	private static Logger logger = Logger.getLogger(UserServiceImpl.class);
+	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
 	static {
 		PropertyConfigurator
 				.configure("/home/admin1/Desktop/SpringWorkspace/FundoNotes/src/main/resources/log4j.properties");
@@ -50,13 +50,13 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 
 	@Override
 	@Transactional
-	public String userRegistration(ValidateUser validateUser) {
-		userDetails = modelMapper.map(validateUser, UserDetails.class);
+	public String userRegistration(UserDataValidation userDataValidation) {
+		userDetails = modelMapper.map(userDataValidation, UserDetails.class);
 		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
 		userDetails.setCreateTime(LocalDateTime.now());
 		userDetails.setUpdateTime(LocalDateTime.now());
 		userDetails.setVarified(false);
-		userRepository.save(userDetails);
+		userDataRepository.save(userDetails);
 		String token = null;
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
@@ -69,9 +69,9 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 
 	@Override
 	@Transactional
-	public String userLogin(LoginDTO loginDto) {
+	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
-		Optional<UserDetails> userDetails = userRepository.findByEmail(loginDto.getUserEmail());
+		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
 		if (userDetails.isPresent() && userDetails.get().isVarified() == true
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
@@ -82,8 +82,8 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 	@Override
 	@Transactional
 	public String userForgotPassword(String email) {
-		LoginDTO loginDto = null;
-		Optional<UserDetails> userDetails = userRepository.findByEmail(loginDto.getUserEmail());
+		UserLoginValidation loginDto = null;
+		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
 			util.javaMail(userDetails.get().getEmail(), token, "");
@@ -91,13 +91,14 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 		return "Sent to email";
 	}
 
-	public String updateRegistration(String token) {
+	@Override
+	public String userVarification(String token) {
 		String message = null;
 		Integer userId = util.jwtTokenParser(token);
 		if (userId != null) {
-			UserDetails details = userRepository.getOne(userId);
+			UserDetails details = userDataRepository.getOne(userId);
 			details.setVarified(true);
-			userRepository.save(details);
+			userDataRepository.save(details);
 			message = "Verified successfully";
 		} else {
 			message = "Not Verified ";
@@ -106,15 +107,15 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 	}
 
 	@Override
-	public String userResetPassword(ForgotPasswordDTO password, String token) {
+	public String userResetPassword(UserForgotPasswordValidation password, String token) {
 		String message = null;
 
 		Integer userId = util.jwtTokenParser(token);
 		if (userId != null) {
-			UserDetails details = userRepository.getOne(userId);
+			UserDetails details = userDataRepository.getOne(userId);
 			if (details.isVarified() == true) {
 				details.setUpdateTime(LocalDateTime.now());
-				userRepository.save(details);
+				userDataRepository.save(details);
 				message = "Verified successfully";
 			} else {
 				message = "Not Verified ";
@@ -125,69 +126,89 @@ public class UserServiceImpl implements UserService, UserNoteLabelService, UserN
 		return message;
 	}
 
-	public void createNote(String noteData, String token) {
+	public UserNotes createNote(String noteData, String token) {
 		Integer userId = util.jwtTokenParser(token);
 		UserNotes notes = null;
 		if (userId != null) {
-			Optional<UserDetails> userDetails = userRepository.findById(userId);
+			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 			if (userDetails.isPresent() && userDetails.get().isVarified()) {
 				notes = modelMapper.map(noteData, UserNotes.class);
 				notes.setNoteCreateTime(LocalDateTime.now());
 				notes.setNoteUpdateTime(LocalDateTime.now());
-				notes = userNotesRepository.save(notes);
+				notes = userNoteRepository.save(notes);
 			}
 		}
+		return notes;
 	}
 
 	@Override
-	public void updateNote(int noteId, String token) {
+	public UserNotes updateNote(Long noteId, String token) {
 		Integer userId = util.jwtTokenParser(token);
 		UserNotes notes = null;
 
 		if (userId != null) {
-			Optional<UserDetails> userDetails = userRepository.findById(userId);
-			if (userDetails.isPresent() && userDetails.get().isVarified()) {			
-				  Optional<UserNotes> noteModel= userNotesRepository.findById(noteId);
-				  noteModel.setNoteUpdateTime(LocalDateTime.now());  
-				notes = userNotesRepository.save(noteModel);
-			}
-		}
-	}
-
-	@Override
-	public void deleteNote(int noteId, String token) {
-		Integer userId = util.jwtTokenParser(token);
-		UserNotes notes = null;
-
-		if (userId != null) {
-			Optional<UserDetails> userDetails = userRepository.findById(userId);
+			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				notes = modelMapper.map(noteId, UserNotes.class);
-				notes.setNoteUpdateTime(LocalDateTime.now());
-				notes = userNotesRepository.deleteByNoteId(notes);
-
+				Optional<UserNotes> noteModel = userNoteRepository.findById(noteId);
+				noteModel.get().setNoteUpdateTime(LocalDateTime.now());
+				notes = userNoteRepository.save(noteModel.get());
 			}
 		}
+		return notes;
 	}
 
 	@Override
-	public List<NoteDTO> showNoteList(NoteDTO validateNote) {
+	public String deleteNote(Long noteId, String token) {
+		Integer userId = util.jwtTokenParser(token);
+		UserNotes notes = null;
+
+		if (userId != null) {
+			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+			if (userDetails.isPresent() && userDetails.get().isVarified()) {
+				userNoteRepository.deleteById(noteId);
+			}
+		}
+
+		return "Deleted Successfully";
+	}
+
+	@Override
+	public List<UserNoteValidation> showNoteList(UserNoteValidation validateNote) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<ValidateUser> showUserList(ValidateUser validateUser) {
+	public List<UserDataValidation> showUserList(UserDataValidation userDataValidation) {
 		return null;
 	}
 
 	@Override
-	public List<NoteLabelDTO> showNoteLabelList(NoteLabelDTO validateNoteLabel) {
+	public List<UserNoteLabelValidation> showNoteLabelList(UserNoteLabelValidation validateNoteLabel) {
 		return null;
 	}
 
 	@Override
-	public List<ValidateUser> showNoteColabratorList(ValidateUser validateUser) {
+	public void createLabel(UserNoteLabelValidation noteLabelValidation, String token) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateLabel(UserNoteLabelValidation noteLabelValidation, String token) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteLabel(UserNoteLabelValidation noteLabelValidation, String token) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

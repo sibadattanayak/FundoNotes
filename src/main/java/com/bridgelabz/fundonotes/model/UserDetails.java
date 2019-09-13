@@ -19,18 +19,25 @@ public class UserDetails {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "User_Id")
 	private Long userId;
+
 	@Column(name = "User_FirstName")
 	private String firstName;
+
 	@Column(name = "User_LastName")
 	private String lastName;
+
 	@Column(name = "User_Email")
 	private String email;
+
 	@Column(name = "User_Password")
 	private String password;
+
 	@Column(name = "User_PasswordCreationTime")
 	private LocalDateTime createTime;
+
 	@Column(name = "User_PasswordUpdationTime")
 	private LocalDateTime updateTime;
+
 	@Column(name = "User_isVarified")
 	private boolean isVarified;
 
@@ -97,5 +104,4 @@ public class UserDetails {
 	public void setVarified(boolean isVarified) {
 		this.isVarified = isVarified;
 	}
-
 }

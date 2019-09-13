@@ -17,21 +17,28 @@ import javax.validation.constraints.NotNull;
 public class UserNotes {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "User_Note_Id")
+	@Column(name = "UserNote_Id")
 	private Long noteId;
-	@Column(name = "User_Note_Data")
+
+	@Column(name = "UserNote_Data")
 	private String noteData;
-	@Column(name = "User_NoteCreation_Time")
+
+	@Column(name = "UserNote_CreationTime")
 	private LocalDateTime noteCreateTime;
-	@Column(name = "User_NoteUpdation_Time")
+
+	@Column(name = "UserNote_UpdationTime")
 	private LocalDateTime noteUpdateTime;
-	@Column(name = "User_Note_isReminder")
-	private boolean reminder;
-	@Column(name = "User_Note_isTrace")
-	private boolean trace;
-	@Column(name = "User_Note_isArchive")
-	private boolean archive;
-	@Column(name = "User_Note_isPinned")
+
+	@Column(name = "UserNote_Reminder")
+	private LocalDateTime reminder;
+
+	@Column(name = "UserNote_isTrace")
+	private boolean isTrace;
+
+	@Column(name = "UserNote_isArchive")
+	private boolean isArchive;
+
+	@Column(name = "UserNote_isPinned")
 	private boolean isPinned;
 
 	public Long getNoteId() {
@@ -58,28 +65,28 @@ public class UserNotes {
 		this.noteUpdateTime = noteUpdateTime;
 	}
 
-	public boolean isReminder() {
+	public LocalDateTime isReminder() {
 		return reminder;
 	}
 
-	public void setReminder(boolean reminder) {
+	public void setReminder(LocalDateTime reminder) {
 		this.reminder = reminder;
 	}
 
 	public boolean isTrace() {
-		return trace;
+		return isTrace;
 	}
 
 	public void setTrace(boolean trace) {
-		this.trace = trace;
+		this.isTrace = trace;
 	}
 
 	public boolean isArchive() {
-		return archive;
+		return isArchive;
 	}
 
 	public void setArchive(boolean archive) {
-		this.archive = archive;
+		this.isArchive = archive;
 	}
 
 	public boolean isPinned() {
