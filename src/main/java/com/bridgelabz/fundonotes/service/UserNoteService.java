@@ -5,12 +5,12 @@ import java.util.List;
 import com.bridgelabz.fundonotes.dto.NoteDTO;
 
 public interface UserNoteService {
-	String createNote(NoteDTO validNote);
+	
+	void createNote(String noteData,String token);
 
-	String updateNote(NoteDTO validNote);
+	void updateNote(int noteId, String token);
 
-	String deleteNote(NoteDTO validNote);
+	void deleteNote(int noteId, String token);
 
 	List<NoteDTO> showNoteList(NoteDTO validateNote);
-
 }

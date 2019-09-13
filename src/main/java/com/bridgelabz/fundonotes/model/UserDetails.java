@@ -10,8 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import net.minidev.json.annotate.JsonIgnore;
-
 @NotNull
 @Entity
 @Table(name = "User_Details")
@@ -20,14 +18,13 @@ public class UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "User_Id")
-	private int userId;
+	private Long userId;
 	@Column(name = "User_FirstName")
 	private String firstName;
 	@Column(name = "User_LastName")
 	private String lastName;
 	@Column(name = "User_Email")
 	private String email;
-	@JsonIgnore
 	@Column(name = "User_Password")
 	private String password;
 	@Column(name = "User_PasswordCreationTime")
@@ -69,11 +66,11 @@ public class UserDetails {
 		this.password = password;
 	}
 
-	public int getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setId(int userId) {
+	public void setId(Long userId) {
 		this.userId = userId;
 	}
 

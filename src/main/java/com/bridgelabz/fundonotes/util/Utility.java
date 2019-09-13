@@ -26,7 +26,7 @@ public class Utility {
 		int upperCase = 0;
 		int specialChar = 0;
 		int count = 0;
-		char ch;
+		char ch = '\u0000';
 
 		Pattern pattern = Pattern.compile("[a-zA-Z0-9]*");
 		Matcher matcher = pattern.matcher(password);
@@ -55,7 +55,7 @@ public class Utility {
 			return "Strength is low";
 	}
 
-	public String jwtToken(Integer userId) {
+	public String jwtToken(Long userId) {
 		String token = null;
 		try {
 			token = JWT.create().withClaim("userId", userId).sign(Algorithm.HMAC512(SECRET));

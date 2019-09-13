@@ -16,23 +16,23 @@ public class NoteLabel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "Label_Id")
-	private int labelId;
-	private int nodeId;
+	private Integer labelId;
+	private Integer nodeId;
 	private String labelName;
 
-	public int getLabelId() {
+	public Integer  getLabelId() {
 		return labelId;
 	}
 
-	public void setLabelId(int labelId) {
+	public void setLabelId(Integer labelId) {
 		this.labelId = labelId;
 	}
 
-	public int getNodeId() {
+	public Integer getNodeId() {
 		return nodeId;
 	}
 
-	public void setNodeId(int nodeId) {
+	public void setNodeId(Integer nodeId) {
 		this.nodeId = nodeId;
 	}
 

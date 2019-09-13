@@ -4,16 +4,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import org.modelmapper.ModelMapper;
-
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.util.Utility;
-
-import net.minidev.json.annotate.JsonIgnore;
 
 public class ValidateUser {
 	Utility util = new Utility();
 	UserDetails user = new UserDetails();
+
 	@NotEmpty(message = "Please provide your first name")
 	private String firstName;
 
@@ -59,7 +56,5 @@ public class ValidateUser {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	
 
 }

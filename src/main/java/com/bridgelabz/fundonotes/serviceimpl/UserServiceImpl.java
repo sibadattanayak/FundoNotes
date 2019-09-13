@@ -18,21 +18,29 @@ import com.bridgelabz.fundonotes.dto.NoteDTO;
 import com.bridgelabz.fundonotes.dto.NoteLabelDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
 import com.bridgelabz.fundonotes.model.UserDetails;
+import com.bridgelabz.fundonotes.model.UserNotes;
+import com.bridgelabz.fundonotes.repository.UserNotesRepository;
 import com.bridgelabz.fundonotes.repository.UserRepository;
 import com.bridgelabz.fundonotes.service.UserNoteLabelService;
+import com.bridgelabz.fundonotes.service.UserNoteService;
 import com.bridgelabz.fundonotes.service.UserService;
 import com.bridgelabz.fundonotes.util.Utility;
 
 @Service
-public class UserServiceImpl implements UserService, UserNoteLabelService {
+public class UserServiceImpl implements UserService, UserNoteLabelService, UserNoteService {
+
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 	@Autowired
-	ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 	@Autowired
-	Utility util;
+	private Utility util;
 	@Autowired
-	BCryptPasswordEncoder bCryptPasswordEncoder;
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	private UserDetails userDetails;
+	@Autowired
+	private UserNotesRepository userNotesRepository;
 
 	private static Logger logger = Logger.getLogger(UserServiceImpl.class);
 	static {
@@ -43,7 +51,7 @@ public class UserServiceImpl implements UserService, UserNoteLabelService {
 	@Override
 	@Transactional
 	public String userRegistration(ValidateUser validateUser) {
-		UserDetails userDetails = modelMapper.map(validateUser, UserDetails.class);
+		userDetails = modelMapper.map(validateUser, UserDetails.class);
 		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
 		userDetails.setCreateTime(LocalDateTime.now());
 		userDetails.setUpdateTime(LocalDateTime.now());
@@ -117,27 +125,70 @@ public class UserServiceImpl implements UserService, UserNoteLabelService {
 		return message;
 	}
 
+	public void createNote(String noteData, String token) {
+		Integer userId = util.jwtTokenParser(token);
+		UserNotes notes = null;
+		if (userId != null) {
+			Optional<UserDetails> userDetails = userRepository.findById(userId);
+			if (userDetails.isPresent() && userDetails.get().isVarified()) {
+				notes = modelMapper.map(noteData, UserNotes.class);
+				notes.setNoteCreateTime(LocalDateTime.now());
+				notes.setNoteUpdateTime(LocalDateTime.now());
+				notes = userNotesRepository.save(notes);
+			}
+		}
+	}
+
+	@Override
+	public void updateNote(int noteId, String token) {
+		Integer userId = util.jwtTokenParser(token);
+		UserNotes notes = null;
+
+		if (userId != null) {
+			Optional<UserDetails> userDetails = userRepository.findById(userId);
+			if (userDetails.isPresent() && userDetails.get().isVarified()) {			
+				  Optional<UserNotes> noteModel= userNotesRepository.findById(noteId);
+				  noteModel.setNoteUpdateTime(LocalDateTime.now());  
+				notes = userNotesRepository.save(noteModel);
+			}
+		}
+	}
+
+	@Override
+	public void deleteNote(int noteId, String token) {
+		Integer userId = util.jwtTokenParser(token);
+		UserNotes notes = null;
+
+		if (userId != null) {
+			Optional<UserDetails> userDetails = userRepository.findById(userId);
+			if (userDetails.isPresent() && userDetails.get().isVarified()) {
+				notes = modelMapper.map(noteId, UserNotes.class);
+				notes.setNoteUpdateTime(LocalDateTime.now());
+				notes = userNotesRepository.deleteByNoteId(notes);
+
+			}
+		}
+	}
+
+	@Override
+	public List<NoteDTO> showNoteList(NoteDTO validateNote) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public List<ValidateUser> showUserList(ValidateUser validateUser) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<NoteLabelDTO> showNoteLabelList(NoteLabelDTO validateNoteLabel) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<ValidateUser> showNoteColabratorList(ValidateUser validateUser) {
-		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public void createNote(NoteDTO validNote) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

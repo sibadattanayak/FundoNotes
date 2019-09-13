@@ -4,7 +4,44 @@ public class NoteDTO {
 
 	private int noteId;
 	private int lableId;
-	private String noteName;
+	private String noteData;
+	private boolean reminder;
+	private boolean trace;
+
+	public boolean isReminder() {
+		return reminder;
+	}
+
+	public void setReminder(boolean reminder) {
+		this.reminder = reminder;
+	}
+
+	public boolean isTrace() {
+		return trace;
+	}
+
+	public void setTrace(boolean trace) {
+		this.trace = trace;
+	}
+
+	public boolean isArchive() {
+		return archive;
+	}
+
+	public void setArchive(boolean archive) {
+		this.archive = archive;
+	}
+
+	public boolean isPinned() {
+		return isPinned;
+	}
+
+	public void setPinned(boolean isPinned) {
+		this.isPinned = isPinned;
+	}
+
+	private boolean archive;
+	private boolean isPinned;
 
 	public int getNoteId() {
 		return noteId;
@@ -22,12 +59,12 @@ public class NoteDTO {
 		this.lableId = lableId;
 	}
 
-	public String getNoteName() {
-		return noteName;
+	public String getNoteData() {
+		return noteData;
 	}
 
-	public void setNoteName(String noteName) {
-		this.noteName = noteName;
+	public void setNoteData(String noteData) {
+		this.noteData = noteData;
 	}
 
 }

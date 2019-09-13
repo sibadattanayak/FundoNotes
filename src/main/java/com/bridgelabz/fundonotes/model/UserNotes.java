@@ -17,28 +17,28 @@ import javax.validation.constraints.NotNull;
 public class UserNotes {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "User_Id")
-	private int userId;
 	@Column(name = "User_Note_Id")
-	private int noteId;
+	private Long noteId;
+	@Column(name = "User_Note_Data")
+	private String noteData;
 	@Column(name = "User_NoteCreation_Time")
 	private LocalDateTime noteCreateTime;
 	@Column(name = "User_NoteUpdation_Time")
 	private LocalDateTime noteUpdateTime;
-	@Column(name = "User_NoteLabel_Id")
-	private int labelId;
 	@Column(name = "User_Note_isReminder")
 	private boolean reminder;
 	@Column(name = "User_Note_isTrace")
 	private boolean trace;
 	@Column(name = "User_Note_isArchive")
 	private boolean archive;
+	@Column(name = "User_Note_isPinned")
+	private boolean isPinned;
 
-	public int getNoteId() {
+	public Long getNoteId() {
 		return noteId;
 	}
 
-	public void setNoteId(int noteId) {
+	public void setNoteId(Long noteId) {
 		this.noteId = noteId;
 	}
 
@@ -56,22 +56,6 @@ public class UserNotes {
 
 	public void setNoteUpdateTime(LocalDateTime noteUpdateTime) {
 		this.noteUpdateTime = noteUpdateTime;
-	}
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
-
-	public int getLabelId() {
-		return labelId;
-	}
-
-	public void setLabelId(int labelId) {
-		this.labelId = labelId;
 	}
 
 	public boolean isReminder() {
@@ -98,4 +82,11 @@ public class UserNotes {
 		this.archive = archive;
 	}
 
+	public boolean isPinned() {
+		return isPinned;
+	}
+
+	public void setPinned(boolean isPinned) {
+		this.isPinned = isPinned;
+	}
 }

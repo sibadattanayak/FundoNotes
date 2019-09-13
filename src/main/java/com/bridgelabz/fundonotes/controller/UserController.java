@@ -3,7 +3,6 @@ package com.bridgelabz.fundonotes.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,15 +14,17 @@ import com.bridgelabz.fundonotes.dto.ForgotPasswordDTO;
 import com.bridgelabz.fundonotes.dto.LoginDTO;
 import com.bridgelabz.fundonotes.dto.NoteDTO;
 import com.bridgelabz.fundonotes.dto.ValidateUser;
-import com.bridgelabz.fundonotes.model.UserNotes;
-import com.bridgelabz.fundonotes.serviceimpl.UserServiceImpl;
+import com.bridgelabz.fundonotes.service.UserNoteService;
+import com.bridgelabz.fundonotes.service.UserService;
 
 @RestController
 @RequestMapping("/fundonote")
 public class UserController {
 
 	@Autowired
-	private UserServiceImpl userServiceImpl;
+	private UserService userServiceImpl;
+	@Autowired
+	private UserNoteService userNoteService;
 
 	@GetMapping(value = "/login")
 	public String login(@RequestBody LoginDTO loginDto) {
@@ -45,18 +46,17 @@ public class UserController {
 		return userServiceImpl.userResetPassword(password, token);
 	}
 
-	@PutMapping(value = "/verifyuser/{token}")
-	public void varifyUser(@PathVariable String token) {
-		userServiceImpl.updateRegistration(token);
-	}
-
+	/*
+	 * @PutMapping(value = "/verifyuser/{token}") public void
+	 * varifyUser(@PathVariable String token) {
+	 * userServiceImpl.updateRegistration(token); }
+	 */
 	@PostMapping("/createnote")
-	public void createNote(@RequestBody NoteDTO validNote) {
-
-		userServiceImpl.createNote(validNote);
+	public void createNote(@RequestBody String noteData, @RequestHeader String token) {
+		userNoteService.createNote(noteData, token);
 	}
 
-	@PutMapping("/updatenote/{data}") 
+	@PutMapping("/updatenote/{data}")
 	public void updateNote(@RequestBody NoteDTO validNote) {
 	}
 
