@@ -17,6 +17,7 @@ import com.bridgelabz.fundonotes.dto.UserDataValidation;
 import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
+import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.model.UserNotes;
 import com.bridgelabz.fundonotes.service.Note;
 import com.bridgelabz.fundonotes.service.User;
@@ -29,26 +30,34 @@ public class UserController {
 	private User userService;
 	@Autowired
 	private Note noteService;
-	UserNotes data =null;
+
+	UserNotes noteDetails = null;
+	UserDetails userDetails = null;
+	String data = null;
+
 	@GetMapping(value = "/login")
 	public ResponseEntity<String> login(@RequestBody UserLoginValidation loginDto) {
-		userService.userLogin(loginDto);
-		return null;
+		data = userService.userLogin(loginDto);
+		return new ResponseEntity<String>(data, HttpStatus.OK);
 	}
 
 	@PostMapping("/registration")
-	public String registration(@RequestBody UserDataValidation userDataValidation) {
-		return userService.userRegistration(userDataValidation);
+	public ResponseEntity<UserDetails> registration(@RequestBody UserDataValidation userDataValidation) {
+		userDetails = userService.userRegistration(userDataValidation);
+		return new ResponseEntity<UserDetails>(userDetails, HttpStatus.OK);
 	}
 
 	@GetMapping("/forgotpassword")
-	public String userForgotPassword(@RequestHeader String email) {
-		return userService.userForgotPassword(email);
+	public ResponseEntity<String> userForgotPassword(@RequestHeader String email) {
+		userService.userForgotPassword(email);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	@PutMapping("/resetpassword/{password}")
-	public String userResetPassword(@RequestBody UserForgotPasswordValidation password, @RequestHeader String token) {
-		return userService.userResetPassword(password, token);
+	public ResponseEntity<String> userResetPassword(@RequestBody UserForgotPasswordValidation password,
+			@RequestHeader String token) {
+		data = userService.userResetPassword(password, token);
+		return new ResponseEntity<String>(data, HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/verifyuser/{token}")
@@ -58,22 +67,22 @@ public class UserController {
 
 	@PostMapping("/createnote")
 	public ResponseEntity<UserNotes> createNote(@RequestBody String noteData, @RequestHeader String token) {
-		data = noteService.createNote(noteData, token);
-		return new ResponseEntity<UserNotes>(data, HttpStatus.OK);
+		noteDetails = noteService.createNote(noteData, token);
+		return new ResponseEntity<UserNotes>(noteDetails, HttpStatus.OK);
 	}
 
 	@PutMapping("/updatenote")
 	public ResponseEntity<UserNotes> updateNote(@RequestBody Long noteId, @RequestHeader String token) {
-		data=noteService.updateNote(noteId, token);
-		return new ResponseEntity<UserNotes>(data, HttpStatus.OK);
-		
+		noteDetails = noteService.updateNote(noteId, token);
+		return new ResponseEntity<UserNotes>(noteDetails, HttpStatus.OK);
+
 	}
 
 	@DeleteMapping("/deletenote")
 	public ResponseEntity<String> deleteNote(@RequestBody Long noteId, @RequestHeader String token) {
-	String data=noteService.deleteNote(noteId, token);
+		data = noteService.deleteNote(noteId, token);
 		return new ResponseEntity<String>(data, HttpStatus.OK);
-		
+
 	}
 
 	@PostMapping("/createlabel")

@@ -50,13 +50,13 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	@Transactional
-	public String userRegistration(UserDataValidation userDataValidation) {
+	public UserDetails userRegistration(UserDataValidation userDataValidation) {
 		userDetails = modelMapper.map(userDataValidation, UserDetails.class);
 		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
 		userDetails.setCreateTime(LocalDateTime.now());
 		userDetails.setUpdateTime(LocalDateTime.now());
 		userDetails.setVarified(false);
-		userDataRepository.save(userDetails);
+		userDetails=userDataRepository.save(userDetails);
 		String token = null;
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
@@ -64,7 +64,7 @@ public class UserServiceImplementation implements User, Label, Note {
 			util.javaMail(userDetails.getEmail(), token, url);
 		}
 		logger.info("user registration");
-		return token;
+		return userDetails;
 	}
 
 	@Override
@@ -160,27 +160,25 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Override
 	public String deleteNote(Long noteId, String token) {
 		Integer userId = util.jwtTokenParser(token);
-		UserNotes notes = null;
-
 		if (userId != null) {
 			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 			if (userDetails.isPresent() && userDetails.get().isVarified()) {
 				userNoteRepository.deleteById(noteId);
 			}
 		}
-
 		return "Deleted Successfully";
 	}
 
 	@Override
 	public List<UserNoteValidation> showNoteList(UserNoteValidation validateNote) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
-	public List<UserDataValidation> showUserList(UserDataValidation userDataValidation) {
-		return null;
+	public List<UserDetails> showUserList(UserDataValidation userDataValidation) {
+	List<UserDetails> userValidation = userDataRepository.findFirstName();
+		return userValidation;
 	}
 
 	@Override
@@ -191,7 +189,6 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Override
 	public void createLabel(UserNoteLabelValidation noteLabelValidation, String token) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -211,5 +208,4 @@ public class UserServiceImplementation implements User, Label, Note {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
