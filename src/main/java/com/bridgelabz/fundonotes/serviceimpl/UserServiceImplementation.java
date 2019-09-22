@@ -37,10 +37,14 @@ public class UserServiceImplementation implements User, Label, Note {
 	private Utility util;
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	@Autowired
+
 	private UserDetails userDetails;
+
 	@Autowired
 	private UserNoteRepository userNoteRepository;
+
+	private UserLoginValidation loginDto;
+	String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
 	static {
@@ -56,7 +60,7 @@ public class UserServiceImplementation implements User, Label, Note {
 		userDetails.setCreateTime(LocalDateTime.now());
 		userDetails.setUpdateTime(LocalDateTime.now());
 		userDetails.setVarified(false);
-		userDetails=userDataRepository.save(userDetails);
+		userDetails = userDataRepository.save(userDetails);
 		String token = null;
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
@@ -70,31 +74,41 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Override
 	@Transactional
 	public String userLogin(UserLoginValidation loginDto) {
+		System.out.println(loginDto.getUserEmail());
+		System.out.println(loginDto.getUserPassword());
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
-		if (userDetails.isPresent() && userDetails.get().isVarified() == true
+		System.out.println(userDetails.get().isVarified());
+		if (userDetails.isPresent() ) {
+			System.out.println("password matching : "+bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword()));
+			if(userDetails.get().isVarified()
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
 		}
+		}
+		else
+			token="user not verified or invalid user";
 		return token;
 	}
 
 	@Override
 	@Transactional
 	public String userForgotPassword(String email) {
-		UserLoginValidation loginDto = null;
-		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
+		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
 			util.javaMail(userDetails.get().getEmail(), token, "");
-		}
-		return "Sent to email";
+			message = "Sent to email";
+		} else
+			message = "Failed to send ";
+		return message;
+
 	}
 
 	@Override
 	public String userVarification(String token) {
 		String message = null;
-		Integer userId = util.jwtTokenParser(token);
+		Long userId = util.jwtTokenParser(token);
 		if (userId != null) {
 			UserDetails details = userDataRepository.getOne(userId);
 			details.setVarified(true);
@@ -108,9 +122,8 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	public String userResetPassword(UserForgotPasswordValidation password, String token) {
-		String message = null;
 
-		Integer userId = util.jwtTokenParser(token);
+		Long userId = util.jwtTokenParser(token);
 		if (userId != null) {
 			UserDetails details = userDataRepository.getOne(userId);
 			if (details.isVarified() == true) {
@@ -127,7 +140,7 @@ public class UserServiceImplementation implements User, Label, Note {
 	}
 
 	public UserNotes createNote(String noteData, String token) {
-		Integer userId = util.jwtTokenParser(token);
+		Long userId = util.jwtTokenParser(token);
 		UserNotes notes = null;
 		if (userId != null) {
 			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
@@ -143,7 +156,7 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	public UserNotes updateNote(Long noteId, String token) {
-		Integer userId = util.jwtTokenParser(token);
+		Long userId = util.jwtTokenParser(token);
 		UserNotes notes = null;
 
 		if (userId != null) {
@@ -159,7 +172,7 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	public String deleteNote(Long noteId, String token) {
-		Integer userId = util.jwtTokenParser(token);
+		Long userId = util.jwtTokenParser(token);
 		if (userId != null) {
 			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 			if (userDetails.isPresent() && userDetails.get().isVarified()) {
@@ -177,8 +190,8 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	public List<UserDetails> showUserList(UserDataValidation userDataValidation) {
-	List<UserDetails> userValidation = userDataRepository.findFirstName();
-		return userValidation;
+//		List<UserDetails> userValidation = userDataRepository.findByFirstName();
+		return null;
 	}
 
 	@Override
@@ -188,24 +201,18 @@ public class UserServiceImplementation implements User, Label, Note {
 
 	@Override
 	public void createLabel(UserNoteLabelValidation noteLabelValidation, String token) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void updateLabel(UserNoteLabelValidation noteLabelValidation, String token) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void deleteLabel(UserNoteLabelValidation noteLabelValidation, String token) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

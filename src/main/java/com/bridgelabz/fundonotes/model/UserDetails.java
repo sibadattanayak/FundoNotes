@@ -20,25 +20,25 @@ public class UserDetails {
 	@Column(name = "User_Id")
 	private Long userId;
 
-	@Column(name = "User_FirstName")
+	@Column(name = "FirstName")
 	private String firstName;
 
-	@Column(name = "User_LastName")
+	@Column(name = "LastName")
 	private String lastName;
 
-	@Column(name = "User_Email")
+	@Column(name = "Email" , unique = true)
 	private String email;
 
-	@Column(name = "User_Password")
+	@Column(name = "Password")
 	private String password;
 
-	@Column(name = "User_PasswordCreationTime")
+	@Column(name = "PasswordCreationTime")
 	private LocalDateTime createTime;
 
-	@Column(name = "User_PasswordUpdationTime")
+	@Column(name = "PasswordUpdationTime")
 	private LocalDateTime updateTime;
 
-	@Column(name = "User_isVarified")
+	@Column(name = "isVarified")
 	private boolean isVarified;
 
 	public LocalDateTime getUpdateTime() {

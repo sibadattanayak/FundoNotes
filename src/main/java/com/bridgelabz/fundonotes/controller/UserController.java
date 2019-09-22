@@ -3,6 +3,7 @@ package com.bridgelabz.fundonotes.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,44 +24,49 @@ import com.bridgelabz.fundonotes.service.Note;
 import com.bridgelabz.fundonotes.service.User;
 
 @RestController
-@RequestMapping("/fundonote")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/fundonotes")
 public class UserController {
 
 	@Autowired
 	private User userService;
 	@Autowired
 	private Note noteService;
-
-	UserNotes noteDetails = null;
-	UserDetails userDetails = null;
+	
+	private UserNotes noteDetails;
+	
+	private UserDetails userDetails;
+	
 	String data = null;
 
 	@GetMapping(value = "/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginValidation loginDto) {
+	public ResponseEntity<String> login(@RequestBody UserLoginValidation loginDto ) {
 		data = userService.userLogin(loginDto);
 		return new ResponseEntity<String>(data, HttpStatus.OK);
 	}
 
 	@PostMapping("/registration")
 	public ResponseEntity<UserDetails> registration(@RequestBody UserDataValidation userDataValidation) {
+		System.out.println("First registration api");
 		userDetails = userService.userRegistration(userDataValidation);
+		System.out.println("Inside registration api");
 		return new ResponseEntity<UserDetails>(userDetails, HttpStatus.OK);
 	}
 
-	@GetMapping("/forgotpassword")
+	@PostMapping("/forgotpassword")
 	public ResponseEntity<String> userForgotPassword(@RequestHeader String email) {
 		userService.userForgotPassword(email);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
-	@PutMapping("/resetpassword/{password}")
+	@PutMapping("/resetpassword")
 	public ResponseEntity<String> userResetPassword(@RequestBody UserForgotPasswordValidation password,
 			@RequestHeader String token) {
 		data = userService.userResetPassword(password, token);
 		return new ResponseEntity<String>(data, HttpStatus.OK);
 	}
 
-	@PutMapping(value = "/verifyuser/{token}")
+	@GetMapping(value = "/verifyuser/{token}")
 	public void varifyUser(@PathVariable String token) {
 		userService.userVarification(token);
 	}

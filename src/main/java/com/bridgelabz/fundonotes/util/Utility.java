@@ -65,10 +65,10 @@ public class Utility {
 		return token;
 	}
 
-	public Integer jwtTokenParser(String token) {
-		Integer user = 0;
+	public Long jwtTokenParser(String token) {
+		Long user = null;
 		if (token != null) {
-			user = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getClaim("userId").asInt();
+			user = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getClaim("userId").asLong();
 		}
 		return user;
 	}

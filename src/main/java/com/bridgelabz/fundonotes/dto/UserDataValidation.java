@@ -4,12 +4,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.util.Utility;
 
 public class UserDataValidation {
-	Utility util = new Utility();
-	UserDetails user = new UserDetails();
 
 	@NotEmpty(message = "Please provide your first name")
 	private String firstName;

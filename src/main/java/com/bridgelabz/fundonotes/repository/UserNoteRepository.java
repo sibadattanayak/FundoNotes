@@ -11,10 +11,8 @@ import com.bridgelabz.fundonotes.model.UserNotes;
 @Repository
 public interface UserNoteRepository extends JpaRepository<UserNotes, Long> {
 
-	//@Query("FROM UserNotes WHERE noteId = ?1")
 	Optional<UserNotes> findByNoteId(Long noteId);
 
-	//@Query("FROM UserNotes WHERE noteId = ?1")
 	Optional<UserNotes> deleteByNoteId(Long noteId);
 
 }
