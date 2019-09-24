@@ -5,6 +5,15 @@ public class ApplicationResponse {
 	private Integer statusCode;
 	private String description;
 
+	public ApplicationResponse() {
+	}
+
+	public ApplicationResponse(Integer statusCode, String description) {
+
+		this.statusCode = statusCode;
+		this.description = description;
+	}
+
 	public Integer getStatusCode() {
 		return statusCode;
 	}

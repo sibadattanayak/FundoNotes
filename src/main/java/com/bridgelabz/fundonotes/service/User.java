@@ -15,7 +15,7 @@ public interface User {
 
 	String userForgotPassword(String email);
 
-	String userResetPassword(UserForgotPasswordValidation password, String token);
+	String userResetPassword(String password, String token);
 
 	String userVarification(String token);
 

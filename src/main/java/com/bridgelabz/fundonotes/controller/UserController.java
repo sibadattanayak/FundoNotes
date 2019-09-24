@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgelabz.fundonotes.dto.ForgetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
-import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
 import com.bridgelabz.fundonotes.model.UserDetails;
-import com.bridgelabz.fundonotes.model.UserNotes;
+import com.bridgelabz.fundonotes.response.ApplicationResponse;
 import com.bridgelabz.fundonotes.service.Note;
 import com.bridgelabz.fundonotes.service.User;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(allowedHeaders = "*", origins = "*", exposedHeaders = { "jwtToken" })
 @RequestMapping("/fundonotes")
 public class UserController {
 
@@ -32,38 +32,33 @@ public class UserController {
 	private User userService;
 	@Autowired
 	private Note noteService;
-	
-	private UserNotes noteDetails;
-	
+
 	private UserDetails userDetails;
-	
 	String data = null;
 
-	@GetMapping(value = "/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginValidation loginDto ) {
+	@PostMapping(value = "/login")
+	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
 		data = userService.userLogin(loginDto);
-		return new ResponseEntity<String>(data, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PostMapping("/registration")
 	public ResponseEntity<UserDetails> registration(@RequestBody UserDataValidation userDataValidation) {
-		System.out.println("First registration api");
 		userDetails = userService.userRegistration(userDataValidation);
-		System.out.println("Inside registration api");
 		return new ResponseEntity<UserDetails>(userDetails, HttpStatus.OK);
 	}
 
-	@PostMapping("/forgotpassword")
-	public ResponseEntity<String> userForgotPassword(@RequestHeader String email) {
-		userService.userForgotPassword(email);
-		return new ResponseEntity<String>(HttpStatus.OK);
+	@PutMapping("/forgotpassword")
+	public ResponseEntity<ApplicationResponse> userForgotPassword(@RequestBody ForgetPasswordDTO forgetPasswordto) {
+		data = userService.userForgotPassword(forgetPasswordto.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PutMapping("/resetpassword")
-	public ResponseEntity<String> userResetPassword(@RequestBody UserForgotPasswordValidation password,
+	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody String password,
 			@RequestHeader String token) {
 		data = userService.userResetPassword(password, token);
-		return new ResponseEntity<String>(data, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@GetMapping(value = "/verifyuser/{token}")
@@ -72,22 +67,21 @@ public class UserController {
 	}
 
 	@PostMapping("/createnote")
-	public ResponseEntity<UserNotes> createNote(@RequestBody String noteData, @RequestHeader String token) {
-		noteDetails = noteService.createNote(noteData, token);
-		return new ResponseEntity<UserNotes>(noteDetails, HttpStatus.OK);
+	public ResponseEntity<ApplicationResponse> createNote(@RequestBody String noteData, @RequestHeader String token) {
+		noteService.createNote(noteData, token);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PutMapping("/updatenote")
-	public ResponseEntity<UserNotes> updateNote(@RequestBody Long noteId, @RequestHeader String token) {
-		noteDetails = noteService.updateNote(noteId, token);
-		return new ResponseEntity<UserNotes>(noteDetails, HttpStatus.OK);
-
+	public ResponseEntity<ApplicationResponse> updateNote(@RequestBody Long noteId, @RequestHeader String token) {
+		noteService.updateNote(noteId, token);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@DeleteMapping("/deletenote")
-	public ResponseEntity<String> deleteNote(@RequestBody Long noteId, @RequestHeader String token) {
+	public ResponseEntity<ApplicationResponse> deleteNote(@RequestBody Long noteId, @RequestHeader String token) {
 		data = noteService.deleteNote(noteId, token);
-		return new ResponseEntity<String>(data, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 
 	}
 

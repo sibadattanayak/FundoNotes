@@ -2,7 +2,7 @@ package com.bridgelabz.fundonotes.dto;
 
 public class UserForgotPasswordValidation {
 	private String password;
-	private String conformPassword;
+	private String confirmPassword;
 
 	public String getPassword() {
 		return password;
@@ -12,11 +12,11 @@ public class UserForgotPasswordValidation {
 		this.password = password;
 	}
 
-	public String getConformPassword() {
-		return conformPassword;
+	public String getConfirmPassword() {
+		return confirmPassword;
 	}
 
-	public void setConformPassword(String conformPassword) {
-		this.conformPassword = conformPassword;
+	public void setConformPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 }

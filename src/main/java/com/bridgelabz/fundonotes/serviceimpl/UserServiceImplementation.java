@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
-import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
@@ -43,10 +42,10 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Autowired
 	private UserNoteRepository userNoteRepository;
 
-	private UserLoginValidation loginDto;
 	String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
+	
 	static {
 		PropertyConfigurator
 				.configure("/home/admin1/Desktop/SpringWorkspace/FundoNotes/src/main/resources/log4j.properties");
@@ -64,7 +63,7 @@ public class UserServiceImplementation implements User, Label, Note {
 		String token = null;
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
-			String url = "http://localhost:8082/fundonote/verifyuser/";
+			String url = "http://localhost:8081/fundonotes/verifyuser/";
 			util.javaMail(userDetails.getEmail(), token, url);
 		}
 		logger.info("user registration");
@@ -74,20 +73,18 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Override
 	@Transactional
 	public String userLogin(UserLoginValidation loginDto) {
-		System.out.println(loginDto.getUserEmail());
-		System.out.println(loginDto.getUserPassword());
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
 		System.out.println(userDetails.get().isVarified());
-		if (userDetails.isPresent() ) {
-			System.out.println("password matching : "+bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword()));
-			if(userDetails.get().isVarified()
-				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
-			token = util.jwtToken(userDetails.get().getUserId());
-		}
-		}
-		else
-			token="user not verified or invalid user";
+		if (userDetails.isPresent()) {
+			System.out.println("password matching : "
+					+ bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword()));
+			if (userDetails.get().isVarified()
+					&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
+				token = util.jwtToken(userDetails.get().getUserId());
+			}
+		} else
+			token = "user not verified or invalid user";
 		return token;
 	}
 
@@ -97,12 +94,11 @@ public class UserServiceImplementation implements User, Label, Note {
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
-			util.javaMail(userDetails.get().getEmail(), token, "");
+			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:4200/forgotpassword/:");
 			message = "Sent to email";
 		} else
 			message = "Failed to send ";
 		return message;
-
 	}
 
 	@Override
@@ -121,7 +117,7 @@ public class UserServiceImplementation implements User, Label, Note {
 	}
 
 	@Override
-	public String userResetPassword(UserForgotPasswordValidation password, String token) {
+	public String userResetPassword(String password, String token) {
 
 		Long userId = util.jwtTokenParser(token);
 		if (userId != null) {
