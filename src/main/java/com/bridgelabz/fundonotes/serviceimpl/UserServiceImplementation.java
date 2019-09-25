@@ -16,6 +16,7 @@ import com.bridgelabz.fundonotes.dto.UserDataValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
+import com.bridgelabz.fundonotes.exception.CustomException;
 import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.model.UserNotes;
 import com.bridgelabz.fundonotes.repository.UserDataRepository;
@@ -45,7 +46,7 @@ public class UserServiceImplementation implements User, Label, Note {
 	String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
-	
+
 	static {
 		PropertyConfigurator
 				.configure("/home/admin1/Desktop/SpringWorkspace/FundoNotes/src/main/resources/log4j.properties");
@@ -75,16 +76,17 @@ public class UserServiceImplementation implements User, Label, Note {
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
-		System.out.println(userDetails.get().isVarified());
-		if (userDetails.isPresent()) {
-			System.out.println("password matching : "
-					+ bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword()));
+		if(!userDetails.isPresent()) {
+			throw new CustomException(404, "email does not exist");
+		}
+		
+		
 			if (userDetails.get().isVarified()
 					&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 				token = util.jwtToken(userDetails.get().getUserId());
 			}
-		} else
-			token = "user not verified or invalid user";
+		 else
+			throw new CustomException(404, "user not verified or invalid user");
 		return token;
 	}
 
@@ -92,6 +94,7 @@ public class UserServiceImplementation implements User, Label, Note {
 	@Transactional
 	public String userForgotPassword(String email) {
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
+		System.out.println("forget password");
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
 			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:4200/forgotpassword/:");
