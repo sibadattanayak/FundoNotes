@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.bridgelabz.fundonotes.model.UserNoteLabel;
 @Repository
-public interface UserNoteLabelRepository extends JpaRepository<UserNoteLabel, Integer> {
+public interface UserNoteLabelRepository extends JpaRepository<UserNoteLabel, Long> {
 
 }

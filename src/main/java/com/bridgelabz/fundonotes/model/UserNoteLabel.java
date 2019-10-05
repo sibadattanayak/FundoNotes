@@ -16,23 +16,25 @@ public class UserNoteLabel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "Label_Id")
-	private Integer labelId;
-	private Integer nodeId;
+	private Long labelId;
+	@Column(nullable = false)
+	private Long nodeId;
+	@Column(nullable = false)
 	private String labelName;
 
-	public Integer  getLabelId() {
+	public Long getLabelId() {
 		return labelId;
 	}
 
-	public void setLabelId(Integer labelId) {
+	public void setLabelId(Long labelId) {
 		this.labelId = labelId;
 	}
 
-	public Integer getNodeId() {
+	public Long getNodeId() {
 		return nodeId;
 	}
 
-	public void setNodeId(Integer nodeId) {
+	public void setNodeId(Long nodeId) {
 		this.nodeId = nodeId;
 	}
 

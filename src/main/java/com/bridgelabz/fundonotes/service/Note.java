@@ -7,11 +7,11 @@ import com.bridgelabz.fundonotes.model.UserNotes;
 
 public interface Note {
 	
-	UserNotes createNote(String noteData,String token);
+	UserNotes createNote(UserNoteValidation userNoteDto,String token);
 
-	UserNotes updateNote(Long noteId, String token);
+	UserNotes updateNote(UserNoteValidation userNoteDto, String token, Long userNoteId);
 
-	String deleteNote(Long noteId, String token);
+	UserNotes deleteNote(Long noteId, String token);
 
 	List<UserNoteValidation> showNoteList(UserNoteValidation validateNote);
 }

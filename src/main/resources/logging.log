@@ -1,0 +1,5 @@
+2019-10-05 18:32:58 INFO  UserServiceImplementation:106 - user logged in successfully
+2019-10-05 18:32:58 INFO  UserServiceImplementation:111 - Login attempted with email - shibadattanayak@gmail.com
+2019-10-05 18:34:36 INFO  UserServiceImplementation:142 - User resetPassword successfully
+2019-10-05 18:35:04 INFO  UserServiceImplementation:106 - user logged in successfully
+2019-10-05 18:35:04 INFO  UserServiceImplementation:111 - Login attempted with email - shibadattanayak@gmail.com

@@ -20,9 +20,13 @@ public class UserNotes {
 	@Column(name = "UserNote_Id")
 	private Long noteId;
 
-	@Column(name = "UserNote_Data")
-	private String noteData;
+	@Column(name = "UserNote_Description")
+	private String noteDescription;
+	
+	@Column(name = "UserNote_Title")
+	private String noteTitle;
 
+	
 	@Column(name = "UserNote_CreationTime")
 	private LocalDateTime noteCreateTime;
 
@@ -40,6 +44,26 @@ public class UserNotes {
 
 	@Column(name = "UserNote_isPinned")
 	private boolean isPinned;
+
+	public String getNoteTitle() {
+		return noteTitle;
+	}
+
+	public void setNoteTitle(String noteTitle) {
+		this.noteTitle = noteTitle;
+	}
+
+	public String getNoteDescription() {
+		return noteDescription;
+	}
+
+	public void setNoteDescription(String noteDescription) {
+		this.noteDescription = noteDescription;
+	}
+
+	public LocalDateTime getReminder() {
+		return reminder;
+	}
 
 	public Long getNoteId() {
 		return noteId;
@@ -96,4 +120,6 @@ public class UserNotes {
 	public void setPinned(boolean isPinned) {
 		this.isPinned = isPinned;
 	}
+	
+
 }
