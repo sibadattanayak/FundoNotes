@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
@@ -96,11 +97,12 @@ public class UserServiceImplementation implements Label, User, Note {
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
-		if (!userDetails.isPresent()) {
-			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());
-			throw new CustomException(404, "email does not exist");
-		}
+//		if (!userDetails.isPresent()) {
+//			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());
+//			throw new CustomException(404, "email does not exist");
+//		}
 		if (userDetails.get().isVarified()
+				
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
 			logger.info("user logged in successfully");
@@ -118,7 +120,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
-			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:4200/forgotpassword/:");
+			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:4200/resetpassword/:");
 			logger.info("API for forgotpassword has been sent to user's registered email");
 			message = "Sent to email";
 		} else {
@@ -130,13 +132,14 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-	public String userResetPassword(String password, String token) {
+	public String userResetPassword(ResetPasswordDTO password, String token) {
 
 		Long userId = util.jwtTokenParser(token);
 		if (userId != null) {
 			UserDetails details = userDataRepository.getOne(userId);
 			if (details.isVarified() == true) {
 				details.setUpdateTime(LocalDateTime.now());
+				details.setPassword( bCryptPasswordEncoder.encode(password.getPasword()));
 				userDataRepository.save(details);
 				message = "Verified successfully";
 				logger.info("User resetPassword successfully");

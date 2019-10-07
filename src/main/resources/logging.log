@@ -3,3 +3,33 @@
 2019-10-05 18:34:36 INFO  UserServiceImplementation:142 - User resetPassword successfully
 2019-10-05 18:35:04 INFO  UserServiceImplementation:106 - user logged in successfully
 2019-10-05 18:35:04 INFO  UserServiceImplementation:111 - Login attempted with email - shibadattanayak@gmail.com
+2019-10-07 09:45:04 INFO  UserServiceImplementation:122 - API for forgotpassword has been sent to user's registered email
+2019-10-07 18:02:47 INFO  UserServiceImplementation:106 - user logged in successfully
+2019-10-07 18:02:47 INFO  UserServiceImplementation:111 - Login attempted with email - shibadattanayak@gmail.com
+2019-10-07 18:03:25 INFO  UserServiceImplementation:143 - User resetPassword successfully
+2019-10-07 18:03:48 INFO  UserServiceImplementation:108 - Login attempted
+2019-10-07 18:13:33 INFO  UserServiceImplementation:67 - User Registered Successfully
+2019-10-07 18:13:39 INFO  UserServiceImplementation:73 - varification mail is sent
+2019-10-07 18:17:20 INFO  UserServiceImplementation:87 - User verified successfully
+2019-10-07 18:18:06 INFO  UserServiceImplementation:107 - user logged in successfully
+2019-10-07 18:18:06 INFO  UserServiceImplementation:112 - Login attempted with email - test@gmail.com
+2019-10-07 18:19:31 INFO  UserServiceImplementation:144 - User resetPassword successfully
+2019-10-07 18:19:52 INFO  UserServiceImplementation:109 - Login attempted
+2019-10-07 18:28:31 INFO  UserServiceImplementation:109 - Login attempted
+2019-10-07 18:36:39 INFO  UserServiceImplementation:67 - User Registered Successfully
+2019-10-07 18:36:43 INFO  UserServiceImplementation:73 - varification mail is sent
+2019-10-07 18:36:57 INFO  UserServiceImplementation:87 - User verified successfully
+2019-10-07 18:37:08 INFO  UserServiceImplementation:109 - Login attempted
+2019-10-07 18:37:33 INFO  UserServiceImplementation:87 - User verified successfully
+2019-10-07 18:37:46 INFO  UserServiceImplementation:107 - user logged in successfully
+2019-10-07 18:37:46 INFO  UserServiceImplementation:112 - Login attempted with email - welcome@gmail.com
+2019-10-07 18:38:35 INFO  UserServiceImplementation:144 - User resetPassword successfully
+2019-10-07 18:40:54 INFO  UserServiceImplementation:87 - User verified successfully
+2019-10-07 18:44:39 INFO  UserServiceImplementation:67 - User Registered Successfully
+2019-10-07 18:44:42 INFO  UserServiceImplementation:73 - varification mail is sent
+2019-10-07 18:44:52 INFO  UserServiceImplementation:87 - User verified successfully
+2019-10-07 18:45:49 INFO  UserServiceImplementation:108 - user logged in successfully
+2019-10-07 18:45:49 INFO  UserServiceImplementation:113 - Login attempted with email - computer@gmail.com
+2019-10-07 18:46:09 INFO  UserServiceImplementation:145 - User resetPassword successfully
+2019-10-07 18:46:35 INFO  UserServiceImplementation:108 - user logged in successfully
+2019-10-07 18:46:35 INFO  UserServiceImplementation:113 - Login attempted with email - computer@gmail.com

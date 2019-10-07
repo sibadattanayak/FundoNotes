@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundonotes.dto.ForgetPasswordDTO;
+import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
@@ -60,7 +61,7 @@ public class UserController {
 	}
 
 	@PutMapping("/resetpassword")
-	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody String password,
+	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody ResetPasswordDTO password,
 			@RequestHeader String token) {
 		data = userService.userResetPassword(password, token);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));

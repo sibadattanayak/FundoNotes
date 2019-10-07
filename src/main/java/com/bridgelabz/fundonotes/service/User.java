@@ -5,6 +5,7 @@ import java.util.List;
 import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
 import com.bridgelabz.fundonotes.model.UserDetails;
+import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
 
 public interface User {
@@ -15,7 +16,7 @@ public interface User {
 
 	String userForgotPassword(String email);
 
-	String userResetPassword(String password, String token);
+	String userResetPassword(ResetPasswordDTO password, String token);
 
 	String userVarification(String token);
 
