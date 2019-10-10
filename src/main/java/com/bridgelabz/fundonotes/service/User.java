@@ -20,8 +20,8 @@ public interface User {
 
 	String userVarification(String token);
 
-	List<UserDetails> showUserList(UserDataValidation userDataValidation);
-
 	List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token);
+
+	List<UserDetails> showUserList(String token);
 
 }

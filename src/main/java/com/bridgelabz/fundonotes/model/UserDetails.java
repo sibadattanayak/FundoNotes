@@ -115,7 +115,7 @@ public class UserDetails {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Column(nullable = false)
-	@JoinColumn(name = "UserNote_Id")
+	@JoinColumn(name = "User_Id")
 	private List<UserNotes> notes = new ArrayList<UserNotes>();
 
 	public List<UserNotes> getNotes() {

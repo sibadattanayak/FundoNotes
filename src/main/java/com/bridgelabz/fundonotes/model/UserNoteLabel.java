@@ -1,10 +1,17 @@
 package com.bridgelabz.fundonotes.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -14,28 +21,23 @@ import javax.validation.constraints.NotNull;
 
 public class UserNoteLabel {
 	@Id
+	@Column(name = "label_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "Label_Id")
-	private Long labelId;
-	@Column(nullable = false)
-	private Long nodeId;
+	private Long id;
+
 	@Column(nullable = false)
 	private String labelName;
 
-	public Long getLabelId() {
-		return labelId;
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "label_id")
+	private List<UserNotes> note = new ArrayList<UserNotes>();
+
+	public Long getId() {
+		return id;
 	}
 
-	public void setLabelId(Long labelId) {
-		this.labelId = labelId;
-	}
-
-	public Long getNodeId() {
-		return nodeId;
-	}
-
-	public void setNodeId(Long nodeId) {
-		this.nodeId = nodeId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getLabelName() {
@@ -46,4 +48,11 @@ public class UserNoteLabel {
 		this.labelName = labelName;
 	}
 
+	public List<UserNotes> getNote() {
+		return note;
+	}
+
+	public void setNote(List<UserNotes> note) {
+		this.note = note;
+	}
 }

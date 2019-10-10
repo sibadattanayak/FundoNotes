@@ -1,6 +1,10 @@
 package com.bridgelabz.fundonotes.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -80,9 +84,8 @@ public class UserController {
 	}
 
 	@PutMapping("/updatenote")
-	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNoteValidation userNoteDto,
-			@RequestHeader String token, @RequestHeader Long userNoteId) {
-		UserNotes userNote = noteService.updateNote(userNoteDto, token, userNoteId);
+	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNotes userNotes, @RequestHeader String token) {
+		UserNotes userNote = noteService.updateNote(userNotes, token);
 		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
 	}
 
@@ -93,8 +96,8 @@ public class UserController {
 	}
 
 	@PostMapping("/createlabel")
-	public ResponseEntity<UserNoteLabel> createLabel(@RequestBody String labelName, @RequestHeader String token) {
-		UserNoteLabel noteLabel = labelService.createLabel(labelName, token);
+	public ResponseEntity<UserNoteLabel> createLabel(@RequestBody UserNoteLabelValidation labelDto, @RequestHeader String token) {
+		UserNoteLabel noteLabel = labelService.createLabel(labelDto, token);
 		return new ResponseEntity<UserNoteLabel>(noteLabel, HttpStatus.OK);
 	}
 
@@ -110,19 +113,85 @@ public class UserController {
 		labelService.deleteLabel(labelId, token);
 	}
 
-	@GetMapping("/userlist")
-	public void userList(@RequestBody String userNames) {
+	
+	@PutMapping("/pinned")
+	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token,@RequestHeader Long noteId) {
+		 noteService.isPinned(token, noteId);
+		return new ResponseEntity<Boolean>(HttpStatus.OK);
 	}
-
-	@GetMapping("/notelist")
-	public void noteList(@RequestBody String userNoteList) {
+	
+	@PutMapping("/archive")
+	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token,@RequestHeader Long noteId) {
+		 noteService.isArchive(token, noteId);
+		return new ResponseEntity<Boolean>( HttpStatus.OK);
 	}
-
-	@GetMapping("/labellist")
-	public void labelList(@RequestBody String noteLabelList) {
+	
+	@PutMapping("/trash")
+	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token,@RequestHeader Long noteId) {
+		 noteService.isTrash(token, noteId);
+		return new ResponseEntity<Boolean>(HttpStatus.OK);
 	}
+	
+	@PutMapping("/reminder")
+	public ResponseEntity<UserNotes> updateReminder(@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime  reminderDate, 
+			@RequestHeader String token,@RequestHeader Long noteId) {
+		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
+		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
+	}  
+		
+	
+	
+	
+	@GetMapping("/showallusers")
+	public ResponseEntity<List<UserDetails>> getAllUserList(@RequestHeader String token)
+	{
+		List<UserDetails> notes = userService.showUserList(token);
+		return new ResponseEntity<List<UserDetails>>(notes,HttpStatus.OK);
+	}
+	
+	
+	
+	
+	
+	
+	@GetMapping("/showallnotes")
+	public ResponseEntity<List<UserNotes>> getAllNotes(@RequestHeader String token)
+	{
+		List<UserNotes> notes = noteService.showNoteList(token);
+		return new ResponseEntity<List<UserNotes>>(notes,HttpStatus.OK);
+	}
+	
+	
+	
+	
+	@GetMapping("/showalllabels")
+	public ResponseEntity<List<UserNoteLabel>> getAllLabelList(@RequestHeader String token)
+	{
+		List<UserNoteLabel> labels=labelService.showLabelList(token);
+		return new ResponseEntity<List<UserNoteLabel>>(labels,HttpStatus.OK);
+	}
+	
+	
+	
+	
 
-	@GetMapping("/colabratorlist")
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@GetMapping("/showallcolabrators")
 	public void colabratorList(@RequestBody String noteColabratorList) {
 	}
 

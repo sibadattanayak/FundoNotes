@@ -102,7 +102,7 @@ public class UserServiceImplementation implements Label, User, Note {
 //			throw new CustomException(404, "email does not exist");
 //		}
 		if (userDetails.get().isVarified()
-				
+
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
 			logger.info("user logged in successfully");
@@ -139,7 +139,7 @@ public class UserServiceImplementation implements Label, User, Note {
 			UserDetails details = userDataRepository.getOne(userId);
 			if (details.isVarified() == true) {
 				details.setUpdateTime(LocalDateTime.now());
-				details.setPassword( bCryptPasswordEncoder.encode(password.getPasword()));
+				details.setPassword(bCryptPasswordEncoder.encode(password.getPasword()));
 				userDataRepository.save(details);
 				message = "Verified successfully";
 				logger.info("User resetPassword successfully");
@@ -166,8 +166,8 @@ public class UserServiceImplementation implements Label, User, Note {
 				notes.setNoteCreateTime(LocalDateTime.now());
 				notes.setNoteUpdateTime(LocalDateTime.now());
 				userDetails.get().getNotes().add(notes);
-				notes = userNoteRepository.save(notes);
 				logger.info("Note created successfully");
+				return notes;
 			} else
 				logger.info("Note couldn't be created");
 			throw new CustomException(106, "Note couldn't be created");
@@ -176,22 +176,23 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-	public UserNotes updateNote(UserNoteValidation userNoteDto, String token, Long userNoteId) {
+	public UserNotes updateNote(UserNotes userNote, String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		logger.info("UserId for creating notes >> " + userId);
 		Optional<UserNotes> notes = null;
 
 		if (userDetails.isPresent() && userId != null) {
-			notes = userNoteRepository.findById(userNoteId);
+			notes = userNoteRepository.findById(userNote.getNoteId());
 			if (notes.isPresent() && userDetails.get().isVarified()) {
-				if (userNoteDto.getNoteTitle() != null) {
+				if (userNote.getNoteTitle() != null) {
 					notes.get().setNoteTitle(userNoteValidation.getNoteTitle());
 				} else {
 					logger.info("User notes data not found");
 					throw new CustomException(104, "Invalid User or User Not verified");
 				}
 
-				if (userNoteDto.getNoteDescription() != null) {
+				if (userNote.getNoteDescription() != null) {
 					notes.get().setNoteDescription(userNoteValidation.getNoteDescription());
 
 				} else {
@@ -219,7 +220,7 @@ public class UserServiceImplementation implements Label, User, Note {
 				userNoteRepository.deleteById(noteId);
 				logger.info("User note deleted successfully");
 			} else {
-				logger.info("User note couldn't be deleted/not found");
+				logger.info("User not found or invalid token");
 				throw new CustomException(104, "Invalid token or user not found");
 			}
 		} else {
@@ -232,68 +233,188 @@ public class UserServiceImplementation implements Label, User, Note {
 	UserNoteLabelRepository labelRepository;
 
 	@Override
-	public UserNoteLabel createLabel(String labelName, String token) {
+	public UserNoteLabel createLabel(UserNoteLabelValidation labelDto, String token) {
+
 		Long userId = util.jwtTokenParser(token);
 		UserNoteLabel label = null;
-		if (userId != null) {
-			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
-			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				label = modelMapper.map(labelName, UserNoteLabel.class);
-				label = labelRepository.save(label);
-			}
-		}
-		return label;
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 
+		if (userId != null && userDetails.isPresent() && userDetails.get().isVarified()) {
+			logger.info("User is present and verified");
+			label = modelMapper.map(labelDto, UserNoteLabel.class);
+			logger.info("DTO mapped with Model");
+			label = labelRepository.save(label);
+			logger.info("Label created successfully");
+			return label;
+		} else {
+			logger.info("User Details not found of user not found");
+			throw new CustomException(400, "User Details not found of user not found");
+		}
 	}
 
 	@Override
 	public UserNoteLabel updateLabel(UserNoteLabelValidation noteLabelValidation, String token) {
+
 		Long userId = util.jwtTokenParser(token);
 		UserNoteLabel label = null;
-		if (userId != null) {
-			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
-			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				Optional<UserNoteLabel> UserNoteLabelData = labelRepository.findById(userId);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 
-				if (userDetails.isPresent()) {
-					label = UserNoteLabelData.get();
-					label.setLabelName(noteLabelValidation.getLabelName());
-					label = labelRepository.save(label);
-				}
-			}
+		if (userId != null && userDetails.isPresent() && userDetails.get().isVarified()) {
+			Optional<UserNoteLabel> UserNoteLabelData = labelRepository.findById(userId);
+			label = UserNoteLabelData.get();
+			label.setLabelName(noteLabelValidation.getLabelName());
+			label = labelRepository.save(label);
+			return label;
+		} else {
+			logger.info("User not found");
+			throw new CustomException(400, "User not found");
 		}
-		return label;
 	}
 
 	@Override
 	public void deleteLabel(Long labelId, String token) {
+
 		Long userId = util.jwtTokenParser(token);
-		Optional<UserNoteLabel> label = null;
-		if (userId != null) {
-			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
-			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				label = labelRepository.findById(labelId);
-				if (label.isPresent()) {
-					labelRepository.deleteById(labelId);
-				}
-				// throw exception
-			}
-			// throw exception
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		Optional<UserNoteLabel> label = labelRepository.findById(labelId);
+
+		if (userId != null && userDetails.isPresent() && userDetails.get().isVarified() && label.isPresent()) {
+
+			labelRepository.deleteById(labelId);
+		} else {
+			logger.info("User not found");
+			throw new CustomException(400, "User not found");
 		}
 	}
 
 	@Override
-	public List<UserNoteValidation> showNoteList(UserNoteValidation validateNote) {
+	public Boolean isPinned(String token, Long noteId) {
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		UserNotes userNote = null;
+		Optional<UserNotes> notes = userNoteRepository.findById(noteId);
+		if (userDetails.isPresent() && notes.isPresent() && userDetails.get().isVarified()) {
+			logger.info("User is present");
+			userNote = notes.get();
+			if (userNote.isPinned()) {
+				logger.info("User note is Pinned ");
+				userNote.setPinned(false);
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note changed to unpinned ");
+				return true;
+			} else {
+				userNote.setPinned(true);
+				logger.info("User note is not Pinned ");
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note is changed to  Pinned ");
+				return false;
+			}
+		} else
+			throw new CustomException(104, "Invalid token or user not verified");
+	}
+
+	@Override
+	public Boolean isArchive(String token, Long noteId) {
+
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		UserNotes userNote = null;
+		Optional<UserNotes> notes = userNoteRepository.findById(noteId);
+		if (userDetails.isPresent() && notes.isPresent() && userDetails.get().isVarified()) {
+			logger.info("User is present");
+			userNote = notes.get();
+			if (userNote.isArchive()) {
+				logger.info("User note is Archive ");
+				userNote.setArchive(false);
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note is removed from Archive ");
+				return true;
+			} else {
+				userNote.setArchive(true);
+				logger.info("User note is not Archive ");
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note is Archive ");
+				return false;
+			}
+		} else
+			throw new CustomException(104, "Invalid token or user not verified");
+	}
+
+	@Override
+	public Boolean isTrash(String token, Long noteId) {
+
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		UserNotes userNote = null;
+		Optional<UserNotes> notes = userNoteRepository.findById(noteId);
+		if (userDetails.isPresent() && notes.isPresent() && userDetails.get().isVarified()) {
+			logger.info("User note is present");
+			userNote = notes.get();
+			if (userNote.isTrace()) {
+				logger.info("User note is in Trace ");
+				userNote.setTrace(false);
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note is removed from Trace ");
+				return true;
+			} else {
+				userNote.setTrace(true);
+				logger.info("User note is not in Trace ");
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+				logger.info("User note is in Trace ");
+				return false;
+			}
+		} else
+			throw new CustomException(104, "Invalid token or user not verified");
+	}
+
+	@Override
+	public UserNotes updateReminder(LocalDateTime reminderDate, String token, Long noteId) {
+
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		UserNotes userNote = null;
+
+		Optional<UserNotes> notes = userNoteRepository.findById(noteId);
+		if (userDetails.isPresent() && notes.isPresent() && userDetails.get().isVarified()) {
+			userNote = notes.get();
+			userNote.setReminder(reminderDate);
+			userNote.setNoteUpdateTime(LocalDateTime.now());
+			userNoteRepository.save(userNote);
+		} else
+			throw new CustomException(104, "Invalid token or user not verified");
+		return userNote;
+	}
+
+	@Override
+	public List<UserNotes> showNoteList(String token) {
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userNoteRepository.findById(userId);//Error
+		List<UserNotes> notes = null;
+		if (userDetails.isPresent()) {
+			if (userDetails.get().isVarified()) {
+				notes = userNoteRepository.findAll();
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+		return notes;
+
+	}
+
+	@Override
+	public List<UserDetails> showUserList(String token) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<UserDetails> showUserList(UserDataValidation userDataValidation) {
-		return null;
-	}
-
-	@Override
-	public List<UserNoteLabel> showNoteLabelList(UserNoteLabelValidation validateNoteLabel, String token) {
+	public List<UserNoteLabel> showLabelList(String token) {
 		Long userId = util.jwtTokenParser(token);
 		List<UserNoteLabel> labels = null;
 		if (userId != null) {
@@ -308,6 +429,8 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

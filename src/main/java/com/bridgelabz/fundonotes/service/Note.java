@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
@@ -9,9 +10,18 @@ public interface Note {
 	
 	UserNotes createNote(UserNoteValidation userNoteDto,String token);
 
-	UserNotes updateNote(UserNoteValidation userNoteDto, String token, Long userNoteId);
+	UserNotes updateNote(UserNotes userNotes, String token);
 
 	UserNotes deleteNote(Long noteId, String token);
 
-	List<UserNoteValidation> showNoteList(UserNoteValidation validateNote);
+	List<UserNotes> showNoteList(String token);
+
+	Boolean isPinned(String token, Long noteId);
+	
+	Boolean isArchive(String token,Long noteId);
+	
+	Boolean isTrash(String token,Long noteId);
+
+	UserNotes updateReminder(LocalDateTime reminderDate, String token, Long noteId);
+
 }
