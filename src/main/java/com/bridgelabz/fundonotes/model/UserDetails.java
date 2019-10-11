@@ -16,8 +16,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.bridgelabz.fundonotes.dto.UserNoteValidation;
-
 @NotNull
 @Entity
 @Table(name = "User_Details")
@@ -116,11 +114,36 @@ public class UserDetails {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Column(nullable = false)
 	@JoinColumn(name = "User_Id")
-	private List<UserNotes> notes = new ArrayList<UserNotes>();
+	private List<UserNotes> notesList = new ArrayList<UserNotes>();
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Column(nullable = false)
+	@JoinColumn(name = "User_Id")
+	private List<UserNoteLabel> labelList = new ArrayList<UserNoteLabel>();
+	
 	public List<UserNotes> getNotes() {
 		// TODO Auto-generated method stub
-		return notes;
+		return notesList;
+	}
+
+	public List<UserNotes> getNotesList() {
+		return notesList;
+	}
+
+	public void setNotesList(List<UserNotes> notesList) {
+		this.notesList = notesList;
+	}
+
+	public List<UserNoteLabel> getLabelList() {
+		return labelList;
+	}
+
+	public void setLabelList(List<UserNoteLabel> labelList) {
+		this.labelList = labelList;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 }

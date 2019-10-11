@@ -45,7 +45,6 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	private UserDetails userDetails;
 	private UserNoteValidation userNoteValidation;
-	private UserNotes userNotes;
 	private String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
@@ -233,7 +232,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	UserNoteLabelRepository labelRepository;
 
 	@Override
-	public UserNoteLabel createLabel(UserNoteLabelValidation labelDto, String token) {
+	public List<UserNoteLabel> createLabel(UserNoteLabelValidation labelDto, String token) {
 
 		Long userId = util.jwtTokenParser(token);
 		UserNoteLabel label = null;
@@ -243,9 +242,10 @@ public class UserServiceImplementation implements Label, User, Note {
 			logger.info("User is present and verified");
 			label = modelMapper.map(labelDto, UserNoteLabel.class);
 			logger.info("DTO mapped with Model");
-			label = labelRepository.save(label);
+			userDetails.get().getLabelList().add(label);
+			userDataRepository.save(userDetails.get());
 			logger.info("Label created successfully");
-			return label;
+			return userDetails.get().getLabelList();
 		} else {
 			logger.info("User Details not found of user not found");
 			throw new CustomException(400, "User Details not found of user not found");
@@ -394,11 +394,11 @@ public class UserServiceImplementation implements Label, User, Note {
 	@Override
 	public List<UserNotes> showNoteList(String token) {
 		Long userId = util.jwtTokenParser(token);
-		Optional<UserDetails> userDetails = userNoteRepository.findById(userId);//Error
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 		List<UserNotes> notes = null;
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
-				notes = userNoteRepository.findAll();
+				notes = userDetails.get().getNotes();
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
@@ -409,22 +409,37 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public List<UserDetails> showUserList(String token) {
-		// TODO Auto-generated method stub
-		return null;
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		List<UserDetails> userData = null;
+		if (userDetails.isPresent()) {
+			userData = userDataRepository.findAll();
+			return userData;
+		} else {
+			throw new CustomException(102, "User not exist");
+		}
 	}
 
 	@Override
 	public List<UserNoteLabel> showLabelList(String token) {
 		Long userId = util.jwtTokenParser(token);
 		List<UserNoteLabel> labels = null;
+		logger.info("Inside User's lable list ");
 		if (userId != null) {
 			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				labels = labelRepository.findAll();
+				labels = userDetails.get().getLabelList();
+				logger.info("User lables found ");
+				return labels;
+			} else {
+				logger.info("User lables not found ");
+				throw new CustomException(400, "User not verified");
 			}
-			// throw exception
+		} else {
+			logger.info("User lables not found ");
+			throw new CustomException(400, "User not exist");
 		}
-		return labels;
+
 	}
 
 	@Override

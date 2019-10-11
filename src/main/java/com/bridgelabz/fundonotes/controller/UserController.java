@@ -43,6 +43,7 @@ public class UserController {
 	private Note noteService;
 	@Autowired
 	private Label labelService;
+	
 	private UserDetails userDetails;
 	private String data = null;
 
@@ -96,9 +97,10 @@ public class UserController {
 	}
 
 	@PostMapping("/createlabel")
-	public ResponseEntity<UserNoteLabel> createLabel(@RequestBody UserNoteLabelValidation labelDto, @RequestHeader String token) {
-		UserNoteLabel noteLabel = labelService.createLabel(labelDto, token);
-		return new ResponseEntity<UserNoteLabel>(noteLabel, HttpStatus.OK);
+	public ResponseEntity<List<UserNoteLabel>> createLabel(@RequestBody UserNoteLabelValidation labelDto,
+			@RequestHeader String token) {
+		List<UserNoteLabel> noteLabel = labelService.createLabel(labelDto, token);
+		return new ResponseEntity<List<UserNoteLabel>>(noteLabel, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/updatelabel/{labelid}")
@@ -113,84 +115,49 @@ public class UserController {
 		labelService.deleteLabel(labelId, token);
 	}
 
-	
 	@PutMapping("/pinned")
-	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token,@RequestHeader Long noteId) {
-		 noteService.isPinned(token, noteId);
+	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token, @RequestHeader Long noteId) {
+		noteService.isPinned(token, noteId);
 		return new ResponseEntity<Boolean>(HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/archive")
-	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token,@RequestHeader Long noteId) {
-		 noteService.isArchive(token, noteId);
-		return new ResponseEntity<Boolean>( HttpStatus.OK);
-	}
-	
-	@PutMapping("/trash")
-	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token,@RequestHeader Long noteId) {
-		 noteService.isTrash(token, noteId);
+	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token, @RequestHeader Long noteId) {
+		noteService.isArchive(token, noteId);
 		return new ResponseEntity<Boolean>(HttpStatus.OK);
 	}
-	
+
+	@PutMapping("/trash")
+	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token, @RequestHeader Long noteId) {
+		noteService.isTrash(token, noteId);
+		return new ResponseEntity<Boolean>(HttpStatus.OK);
+	}
+
 	@PutMapping("/reminder")
-	public ResponseEntity<UserNotes> updateReminder(@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime  reminderDate, 
-			@RequestHeader String token,@RequestHeader Long noteId) {
+	public ResponseEntity<UserNotes> updateReminder(@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
+			@RequestHeader String token, @RequestHeader Long noteId) {
 		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
-	}  
-		
-	
-	
-	
-	@GetMapping("/showallusers")
-	public ResponseEntity<List<UserDetails>> getAllUserList(@RequestHeader String token)
-	{
-		List<UserDetails> notes = userService.showUserList(token);
-		return new ResponseEntity<List<UserDetails>>(notes,HttpStatus.OK);
 	}
-	
-	
-	
-	
-	
-	
-	@GetMapping("/showallnotes")
-	public ResponseEntity<List<UserNotes>> getAllNotes(@RequestHeader String token)
-	{
-		List<UserNotes> notes = noteService.showNoteList(token);
-		return new ResponseEntity<List<UserNotes>>(notes,HttpStatus.OK);
-	}
-	
-	
-	
-	
-	@GetMapping("/showalllabels")
-	public ResponseEntity<List<UserNoteLabel>> getAllLabelList(@RequestHeader String token)
-	{
-		List<UserNoteLabel> labels=labelService.showLabelList(token);
-		return new ResponseEntity<List<UserNoteLabel>>(labels,HttpStatus.OK);
-	}
-	
-	
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@GetMapping("/showallusers")
+	public ResponseEntity<List<UserDetails>> getAllUserList(@RequestHeader String token) {
+		List<UserDetails> notes = userService.showUserList(token);
+		return new ResponseEntity<List<UserDetails>>(notes, HttpStatus.OK);
+	}
+
+	@GetMapping("/showallnotes")
+	public ResponseEntity<List<UserNotes>> getAllNotes(@RequestHeader String token) {
+		List<UserNotes> notes = noteService.showNoteList(token);
+		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	}
+
+	@GetMapping("/showalllabels")
+	public ResponseEntity<List<UserNoteLabel>> getAllLabelList(@RequestHeader String token) {
+		List<UserNoteLabel> labels = labelService.showLabelList(token);
+		return new ResponseEntity<List<UserNoteLabel>>(labels, HttpStatus.OK);
+	}
+
 	@GetMapping("/showallcolabrators")
 	public void colabratorList(@RequestBody String noteColabratorList) {
 	}

@@ -48,8 +48,7 @@ public class UserNotes {
 
 	@Column(name = "UserNote_isPinned")
 	private boolean isPinned;
-
-
+	
 	public Long getNoteId() {
 		return noteId;
 	}
@@ -148,7 +147,6 @@ public class UserNotes {
 	public void setLabel(List<UserNoteLabel> label) {
 		this.label = label;
 	}
-
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "UserNote_Id")

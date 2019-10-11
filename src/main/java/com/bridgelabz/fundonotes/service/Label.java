@@ -7,7 +7,7 @@ import com.bridgelabz.fundonotes.model.UserNoteLabel;
 
 public interface Label {
 
-	UserNoteLabel createLabel(UserNoteLabelValidation labelDto, String token);
+	List<UserNoteLabel> createLabel(UserNoteLabelValidation labelDto, String token);
 
 	UserNoteLabel updateLabel(UserNoteLabelValidation noteLabelValidation, String token);
 

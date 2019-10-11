@@ -2,11 +2,10 @@ package com.bridgelabz.fundonotes.service;
 
 import java.util.List;
 
-import com.bridgelabz.fundonotes.dto.UserForgotPasswordValidation;
-import com.bridgelabz.fundonotes.dto.UserLoginValidation;
-import com.bridgelabz.fundonotes.model.UserDetails;
 import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
+import com.bridgelabz.fundonotes.dto.UserLoginValidation;
+import com.bridgelabz.fundonotes.model.UserDetails;
 
 public interface User {
 
