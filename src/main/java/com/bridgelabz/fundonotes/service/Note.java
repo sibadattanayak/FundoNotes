@@ -8,7 +8,7 @@ import com.bridgelabz.fundonotes.model.UserNotes;
 
 public interface Note {
 	
-	UserNotes createNote(UserNoteValidation userNoteDto,String token);
+	List<UserNotes> createNote(UserNoteValidation userNoteDto,String token);
 
 	UserNotes updateNote(UserNotes userNotes, String token);
 

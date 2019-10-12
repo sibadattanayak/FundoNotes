@@ -155,23 +155,21 @@ public class UserServiceImplementation implements Label, User, Note {
 		return message;
 	}
 
-	public UserNotes createNote(UserNoteValidation userNoteDto, String token) {
+	public List<UserNotes> createNote(UserNoteValidation userNoteDto, String token) {
 		Long userId = util.jwtTokenParser(token);
 		UserNotes notes = null;
-		if (userId != null) {
-			Optional<UserDetails> userDetails = userDataRepository.findById(userId);
-			if (userDetails.isPresent() && userDetails.get().isVarified()) {
-				notes = modelMapper.map(userNoteDto, UserNotes.class);
-				notes.setNoteCreateTime(LocalDateTime.now());
-				notes.setNoteUpdateTime(LocalDateTime.now());
-				userDetails.get().getNotes().add(notes);
-				logger.info("Note created successfully");
-				return notes;
-			} else
-				logger.info("Note couldn't be created");
-			throw new CustomException(106, "Note couldn't be created");
-		}
-		return notes;
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		if (userId != null && userDetails.isPresent() && userDetails.get().isVarified()) {
+			notes = modelMapper.map(userNoteDto, UserNotes.class);
+			notes.setNoteCreateTime(LocalDateTime.now());
+			notes.setNoteUpdateTime(LocalDateTime.now());
+			userDetails.get().getNotesList().add(notes);
+			userDataRepository.save(userDetails.get());
+			logger.info("Note created successfully");
+			return userDetails.get().getNotesList();
+		} else
+			logger.info("Note couldn't be created");
+		throw new CustomException(106, "Note couldn't be created");
 	}
 
 	@Override
@@ -180,9 +178,8 @@ public class UserServiceImplementation implements Label, User, Note {
 		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 		logger.info("UserId for creating notes >> " + userId);
 		Optional<UserNotes> notes = null;
-
 		if (userDetails.isPresent() && userId != null) {
-			notes = userNoteRepository.findById(userNote.getNoteId());
+			notes = userNoteRepository.findById(userNote.getId());
 			if (notes.isPresent() && userDetails.get().isVarified()) {
 				if (userNote.getNoteTitle() != null) {
 					notes.get().setNoteTitle(userNoteValidation.getNoteTitle());
@@ -190,10 +187,8 @@ public class UserServiceImplementation implements Label, User, Note {
 					logger.info("User notes data not found");
 					throw new CustomException(104, "Invalid User or User Not verified");
 				}
-
 				if (userNote.getNoteDescription() != null) {
 					notes.get().setNoteDescription(userNoteValidation.getNoteDescription());
-
 				} else {
 					logger.info("User note not found for updating note");
 					throw new CustomException(104, "Invalid User or NoteDescription is null");

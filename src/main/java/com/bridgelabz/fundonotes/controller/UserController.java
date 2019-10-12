@@ -78,10 +78,10 @@ public class UserController {
 	}
 
 	@PostMapping("/createnote")
-	public ResponseEntity<UserNotes> createNote(@RequestBody UserNoteValidation userNoteDto,
+	public ResponseEntity<List<UserNotes>> createNote(@RequestBody UserNoteValidation userNoteDto,
 			@RequestHeader String token) {
-		UserNotes userNote = noteService.createNote(userNoteDto, token);
-		return new ResponseEntity<UserNotes>(userNote, HttpStatus.CREATED);
+		List<UserNotes> userNote = noteService.createNote(userNoteDto, token);
+		return new ResponseEntity<List<UserNotes>>(userNote, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/updatenote")

@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -21,9 +22,9 @@ import javax.validation.constraints.NotNull;
 @Table(name = "User_Notes")
 public class UserNotes {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "UserNote_Id")
-	private Long noteId;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
 	@Column(name = "UserNote_Description")
 	private String noteDescription;
@@ -48,101 +49,82 @@ public class UserNotes {
 
 	@Column(name = "UserNote_isPinned")
 	private boolean isPinned;
-	
-	public Long getNoteId() {
-		return noteId;
+
+	public Long getId() {
+		return id;
 	}
 
-
-	public void setNoteId(Long noteId) {
-		this.noteId = noteId;
+	public void setId(Long id) {
+		this.id = id;
 	}
-
 
 	public String getNoteDescription() {
 		return noteDescription;
 	}
 
-
 	public void setNoteDescription(String noteDescription) {
 		this.noteDescription = noteDescription;
 	}
-
 
 	public String getNoteTitle() {
 		return noteTitle;
 	}
 
-
 	public void setNoteTitle(String noteTitle) {
 		this.noteTitle = noteTitle;
 	}
-
 
 	public LocalDateTime getNoteCreateTime() {
 		return noteCreateTime;
 	}
 
-
 	public void setNoteCreateTime(LocalDateTime noteCreateTime) {
 		this.noteCreateTime = noteCreateTime;
 	}
-
 
 	public LocalDateTime getNoteUpdateTime() {
 		return noteUpdateTime;
 	}
 
-
 	public void setNoteUpdateTime(LocalDateTime noteUpdateTime) {
 		this.noteUpdateTime = noteUpdateTime;
 	}
-
 
 	public LocalDateTime getReminder() {
 		return reminder;
 	}
 
-
 	public void setReminder(LocalDateTime reminder) {
 		this.reminder = reminder;
 	}
-
 
 	public boolean isTrace() {
 		return isTrace;
 	}
 
-
 	public void setTrace(boolean isTrace) {
 		this.isTrace = isTrace;
 	}
-
 
 	public boolean isArchive() {
 		return isArchive;
 	}
 
-
 	public void setArchive(boolean isArchive) {
 		this.isArchive = isArchive;
 	}
-
 
 	public boolean isPinned() {
 		return isPinned;
 	}
 
-
 	public void setPinned(boolean isPinned) {
 		this.isPinned = isPinned;
 	}
 
-
 	public List<UserNoteLabel> getLabel() {
 		return label;
 	}
-
 
 	public void setLabel(List<UserNoteLabel> label) {
 		this.label = label;
@@ -151,4 +133,17 @@ public class UserNotes {
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "UserNote_Id")
 	private List<UserNoteLabel> label = new ArrayList<UserNoteLabel>();
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Column(nullable = false)
+	@JoinColumn(name = "UserNote_Id")
+	private List<UserDetails> notesList = new ArrayList<UserDetails>();
+
+	public List<UserDetails> getNotesList() {
+		return notesList;
+	}
+
+	public void setNotesList(List<UserDetails> notesList) {
+		this.notesList = notesList;
+	}
 }
