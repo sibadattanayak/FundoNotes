@@ -17,6 +17,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @NotNull
 @Entity
 @Table(name = "User_Notes")
@@ -25,6 +27,16 @@ public class UserNotes {
 	@Column(name = "UserNote_Id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+
+	private String color;
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
 
 	@Column(name = "UserNote_Description")
 	private String noteDescription;
@@ -138,6 +150,18 @@ public class UserNotes {
 	@Column(nullable = false)
 	@JoinColumn(name = "UserNote_Id")
 	private List<UserDetails> notesList = new ArrayList<UserDetails>();
+
+	@JsonIgnore
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<UserDetails> collabratorUserList;
+
+	public List<UserDetails> getCollabratorUserList() {
+		return collabratorUserList;
+	}
+
+	public void setCollabratorUserList(List<UserDetails> collabratorUserList) {
+		this.collabratorUserList = collabratorUserList;
+	}
 
 	public List<UserDetails> getNotesList() {
 		return notesList;

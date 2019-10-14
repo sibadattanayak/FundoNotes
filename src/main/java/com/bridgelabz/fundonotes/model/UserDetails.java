@@ -12,15 +12,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @NotNull
 @Entity
 @Table(name = "User_Details")
 public class UserDetails {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "User_Id")
@@ -32,9 +37,16 @@ public class UserDetails {
 	@Column(name = "LastName")
 	private String lastName;
 
+	//@Email
 	@Column(name = "Email", unique = true, nullable = false)
 	private String email;
 
+	/*
+	 * @Pattern.List({ @Pattern(regexp = "(?=.*[0-9])", message =
+	 * "Password must contain one digit.")
+	 */
+
+	//@Size(min = 3, max = 10, message = "Password Length must be between 3 to 10")
 	@Column(name = "Password", nullable = false)
 	private String password;
 
@@ -120,7 +132,19 @@ public class UserDetails {
 	@Column(nullable = false)
 	@JoinColumn(name = "User_Id")
 	private List<UserNoteLabel> labelList = new ArrayList<UserNoteLabel>();
-	
+
+	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "collabratorUserList")
+	@JsonIgnore
+	private List<UserNotes> collabratorNoteList;
+
+	public List<UserNotes> getCollabratorNoteList() {
+		return collabratorNoteList;
+	}
+
+	public void setCollabratorNoteList(List<UserNotes> collabratorNoteList) {
+		this.collabratorNoteList = collabratorNoteList;
+	}
+
 	public List<UserNotes> getNotes() {
 		// TODO Auto-generated method stub
 		return notesList;

@@ -56,6 +56,68 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	@Transactional
+	public String addCollaborater(String token, String email, Long noteId) {
+		Long userId = util.jwtTokenParser(token);
+
+		if (userId.equals(null)) {
+			throw new CustomException(400, "User not found 1");
+		}
+		Optional<UserDetails> user = userDataRepository.findById(userId);
+		Optional<UserDetails> checkUser = userDataRepository.findByEmail(email);
+
+		if (!checkUser.isPresent()) {
+			throw new CustomException(400, "User not found 2");
+		}
+		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
+				.findFirst();
+		if (!checkNote.isPresent()) {
+			throw new CustomException(400, "User not found 4");
+		}
+		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
+				.filter(data -> data.getId() == noteId).findFirst();
+		if (collaboratedNote.isPresent()) {
+			throw new CustomException(400, "User not found 5");
+		}
+		user.get().getCollabratorNoteList().add(checkNote.get());
+		checkUser.get().getCollabratorNoteList().add(checkNote.get());
+		checkNote.get().getCollabratorUserList().add(checkUser.get());
+		userNoteRepository.save(checkNote.get());
+		userDataRepository.save(user.get());
+		return "User Collaborated";
+	}
+
+	@Override
+	public String removeCollaborater(String token, String email, Long noteId) {
+		Long userId = util.jwtTokenParser(token);
+
+		if (userId.equals(null)) {
+			throw new CustomException(400, "User not found");
+		}
+		Optional<UserDetails> user = userDataRepository.findById(userId);
+		Optional<UserDetails> checkUser = userDataRepository.findByEmail(email);
+
+		if (!checkUser.isPresent()) {
+			throw new CustomException(400, "User not found");
+		}
+		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
+				.findFirst();
+		if (!checkNote.isPresent()) {
+			throw new CustomException(400, "User not found");
+		}
+		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
+				.filter(data -> data.getId() == noteId).findFirst();
+		if (collaboratedNote.isPresent()) {
+			throw new CustomException(400, "User not found");
+		}
+
+		checkNote.get().getCollabratorUserList().remove(checkUser.get());
+		userNoteRepository.save(checkNote.get());
+		userDataRepository.save(user.get());
+		return "User Collaborated";
+	}
+
+	@Override
+
 	public UserDetails userRegistration(UserDataValidation userDataValidation) {
 		userDetails = modelMapper.map(userDataValidation, UserDetails.class);
 		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
@@ -96,17 +158,17 @@ public class UserServiceImplementation implements Label, User, Note {
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
-//		if (!userDetails.isPresent()) {
-//			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());
-//			throw new CustomException(404, "email does not exist");
-//		}
-		if (userDetails.get().isVarified()
 
+		if (!userDetails.isPresent()) {
+			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());
+			throw new CustomException(404, "email does not exist");
+		}
+		if (userDetails.isPresent() && userDetails.get().isVarified()
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
-			logger.info("user logged in successfully");
+			logger.info(loginDto.getUserEmail() + " user logged in successfully");
 		} else {
-			logger.info("Login attempted");
+			logger.info("Login attempted --> " + loginDto.getUserEmail());
 			throw new CustomException(404, "user not verified or invalid user");
 		}
 		logger.info("Login attempted with email - " + loginDto.getUserEmail());
@@ -182,13 +244,13 @@ public class UserServiceImplementation implements Label, User, Note {
 			notes = userNoteRepository.findById(userNote.getId());
 			if (notes.isPresent() && userDetails.get().isVarified()) {
 				if (userNote.getNoteTitle() != null) {
-					notes.get().setNoteTitle(userNoteValidation.getNoteTitle());
+					notes.get().setNoteTitle(userNote.getNoteTitle());
 				} else {
 					logger.info("User notes data not found");
 					throw new CustomException(104, "Invalid User or User Not verified");
 				}
 				if (userNote.getNoteDescription() != null) {
-					notes.get().setNoteDescription(userNoteValidation.getNoteDescription());
+					notes.get().setNoteDescription(userNote.getNoteDescription());
 				} else {
 					logger.info("User note not found for updating note");
 					throw new CustomException(104, "Invalid User or NoteDescription is null");
@@ -439,8 +501,28 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
-		// TODO Auto-generated method stub
 		return null;
+
+	}
+
+	@Override
+	public UserNotes updateColor(String color, String token, Long noteId) {
+		System.out.println("color: " + color);
+		Long userId = util.jwtTokenParser	(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		UserNotes userNote = null;
+		if (userDetails.isPresent()) {
+			Optional<UserNotes> notes = userNoteRepository.findById(noteId);
+			if (notes.isPresent() && userDetails.get().isVarified()) {
+				userNote = notes.get();
+				userNote.setColor(color);
+				userNote.setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(userNote);
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+		return userNote;
 	}
 
 }

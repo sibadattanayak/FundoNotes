@@ -11,6 +11,15 @@ public class UserNoteValidation {
 	private boolean isTrace;
 	private boolean isArcive;
 	private boolean isPinned;
+	private String color;
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
 
 	public String getNoteTitle() {
 		return noteTitle;

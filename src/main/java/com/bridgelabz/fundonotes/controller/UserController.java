@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundonotes.dto.ForgetPasswordDTO;
@@ -43,7 +44,6 @@ public class UserController {
 	private Note noteService;
 	@Autowired
 	private Label labelService;
-	
 	private UserDetails userDetails;
 	private String data = null;
 
@@ -86,6 +86,7 @@ public class UserController {
 
 	@PutMapping("/updatenote")
 	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNotes userNotes, @RequestHeader String token) {
+		System.out.println("Inside update Notes");
 		UserNotes userNote = noteService.updateNote(userNotes, token);
 		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
 	}
@@ -134,7 +135,8 @@ public class UserController {
 	}
 
 	@PutMapping("/reminder")
-	public ResponseEntity<UserNotes> updateReminder(@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
+	public ResponseEntity<UserNotes> updateReminder(
+			@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
 			@RequestHeader String token, @RequestHeader Long noteId) {
 		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
@@ -158,6 +160,25 @@ public class UserController {
 		return new ResponseEntity<List<UserNoteLabel>>(labels, HttpStatus.OK);
 	}
 
+	@PostMapping("/addcollaborator")
+	public ResponseEntity<UserNoteLabel> addCollaborator(@RequestHeader String token, @RequestParam String email,
+			@RequestParam Long noteId) {
+		noteService.addCollaborater(token, email, noteId);
+		return new ResponseEntity<UserNoteLabel>(HttpStatus.OK);
+	}
+
+	@DeleteMapping("/removecollaborator")
+	public ResponseEntity<UserNoteLabel> removeCollaborator(@RequestHeader String token, @RequestParam String email,
+			@RequestParam Long noteId) {
+		noteService.removeCollaborater(token, email, noteId);
+		return new ResponseEntity<UserNoteLabel>(HttpStatus.OK);
+	}
+
+	@PutMapping("/changecolor/{color}")
+	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color, @RequestHeader String token, @RequestParam Long noteId) {
+		UserNotes notes = noteService.updateColor( color, token, noteId);
+		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
+	}
 	@GetMapping("/showallcolabrators")
 	public void colabratorList(@RequestBody String noteColabratorList) {
 	}
