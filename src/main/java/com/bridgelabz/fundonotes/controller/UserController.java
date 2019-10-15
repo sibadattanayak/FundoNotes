@@ -92,7 +92,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/deletenote")
-	public ResponseEntity<UserNotes> deleteNote(@RequestHeader Long noteId, @RequestHeader String token) {
+	public ResponseEntity<UserNotes> deleteNote(@RequestParam Long noteId, @RequestHeader String token) {
 		UserNotes userNote = noteService.deleteNote(noteId, token);
 		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
 	}
@@ -123,21 +123,21 @@ public class UserController {
 	}
 
 	@PutMapping("/archive")
-	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token, @RequestHeader Long noteId) {
+	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token, @RequestParam Long noteId) {
 		noteService.isArchive(token, noteId);
-		return new ResponseEntity<Boolean>(HttpStatus.OK);
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 	@PutMapping("/trash")
-	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token, @RequestHeader Long noteId) {
+	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token, @RequestParam Long noteId) {
 		noteService.isTrash(token, noteId);
 		return new ResponseEntity<Boolean>(HttpStatus.OK);
 	}
 
 	@PutMapping("/reminder")
 	public ResponseEntity<UserNotes> updateReminder(
-			@RequestHeader @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
-			@RequestHeader String token, @RequestHeader Long noteId) {
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
+			@RequestHeader String token, @RequestParam Long noteId) {
 		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
 	}
@@ -175,7 +175,7 @@ public class UserController {
 	}
 
 	@PutMapping("/changecolor/{color}")
-	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color, @RequestHeader String token, @RequestParam Long noteId) {
+	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color,@RequestParam Long noteId, @RequestHeader String token) {
 		UserNotes notes = noteService.updateColor( color, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
 	}

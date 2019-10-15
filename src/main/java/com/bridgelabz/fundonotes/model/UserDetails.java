@@ -146,7 +146,6 @@ public class UserDetails {
 	}
 
 	public List<UserNotes> getNotes() {
-		// TODO Auto-generated method stub
 		return notesList;
 	}
 

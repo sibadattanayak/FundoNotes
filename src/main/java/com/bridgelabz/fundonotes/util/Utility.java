@@ -3,13 +3,17 @@ package com.bridgelabz.fundonotes.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.bridgelabz.fundonotes.configuration.RabitMqConfig;
+import com.bridgelabz.fundonotes.response.RabbitMessage;
 
 @Component
 public class Utility {
@@ -86,6 +90,11 @@ public class Utility {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
 
+	@RabbitListener(queues = RabitMqConfig.queueName)
+	public void sendToRabitMq(final Message<RabbitMessage> message) {
+		RabbitMessage msg = message.getPayload();
+		javaMail(msg.getEmail(), msg.getToken(), msg.getLink());
 	}
 }

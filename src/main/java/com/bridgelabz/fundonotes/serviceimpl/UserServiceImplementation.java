@@ -1,17 +1,20 @@
 package com.bridgelabz.fundonotes.serviceimpl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bridgelabz.fundonotes.configuration.RabitMqConfig;
 import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserDataValidation;
 import com.bridgelabz.fundonotes.dto.UserLoginValidation;
@@ -24,6 +27,7 @@ import com.bridgelabz.fundonotes.model.UserNotes;
 import com.bridgelabz.fundonotes.repository.UserDataRepository;
 import com.bridgelabz.fundonotes.repository.UserNoteLabelRepository;
 import com.bridgelabz.fundonotes.repository.UserNoteRepository;
+import com.bridgelabz.fundonotes.response.RabbitMessage;
 import com.bridgelabz.fundonotes.service.Label;
 import com.bridgelabz.fundonotes.service.Note;
 import com.bridgelabz.fundonotes.service.User;
@@ -42,6 +46,8 @@ public class UserServiceImplementation implements Label, User, Note {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
 	private UserNoteRepository userNoteRepository;
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
 	private UserDetails userDetails;
 	private UserNoteValidation userNoteValidation;
@@ -130,7 +136,19 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
 			String url = "http://localhost:8081/fundonotes/verifyuser/";
-			util.javaMail(userDetails.getEmail(), token, url);
+			//util.javaMail(userDetails.getEmail(), token, url);
+			try {
+				RabbitMessage msg=new RabbitMessage();
+				msg.setEmail(userDataValidation.getEmail());
+				msg.setLink(url);
+				msg.setToken(token);
+			 rabbitTemplate.convertAndSend(RabitMqConfig.EXCHANGE_NAME, RabitMqConfig.ROUTING_KEY, msg);
+			//jmsUtility.sendMail(registrationDto.getEmail(), token, url);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			
 			logger.info("varification mail is sent");
 		}
 		return userDetails;
@@ -502,7 +520,20 @@ public class UserServiceImplementation implements Label, User, Note {
 	@Override
 	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
 		return null;
-
+		/*
+		 * Long userId = util.jwtTokenParser(token); Optional<User> user =
+		 * checkUser(userId); // Optional<Notes> optionalNote =
+		 * notesRepository.findById(noteId); // if (!optionalNote.isPresent()) { //
+		 * throw new UserException("Note not Found"); // } UserNotes note =
+		 * user.get().getListofNotes().stream().filter(checkNote ->
+		 * checkNote.getNoteId().equals(noteId)) .findFirst().orElseThrow(() -> new
+		 * UserException("Note not found")); List<Collaborator> listOfCollaboratedUser =
+		 * userCollaboratorRepository.findByNoteId(note.getId()); List<String>
+		 * userEmailList = new ArrayList<String>();
+		 * listOfCollaboratedUser.forEach(collaboratedUser -> { Optional<User> user2 =
+		 * userRepository.findById(collaboratedUser.getUser_id());
+		 * userEmailList.add(user2.get().getEmailId()); }); return userEmailList;
+		 */
 	}
 
 	@Override
