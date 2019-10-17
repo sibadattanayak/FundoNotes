@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -473,7 +474,10 @@ public class UserServiceImplementation implements Label, User, Note {
 		List<UserNotes> notes = null;
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
-				notes = userDetails.get().getNotes();
+				//notes = userDetails.get().getNotes();
+				notes = userDetails.get().getNotes().stream().filter(data -> !data.isArchive() && !data.isTrace())
+						.collect(Collectors.toList());
+
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
@@ -539,7 +543,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	@Override
 	public UserNotes updateColor(String color, String token, Long noteId) {
 		System.out.println("color: " + color);
-		Long userId = util.jwtTokenParser	(token);
+		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 		UserNotes userNote = null;
 		if (userDetails.isPresent()) {
@@ -554,6 +558,58 @@ public class UserServiceImplementation implements Label, User, Note {
 		} else
 			throw new CustomException(102, "User not exist");
 		return userNote;
+	}
+	
+	@Override
+	public List<UserNotes> getReminder(String token) 
+	{
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		Optional<UserNotes> notes = null;
+		List<UserNotes> notesList = null;
+		if (userDetails.isPresent()) {
+			if (userDetails.get().isVarified()) {
+				notesList = userDetails.get().getNotes();
+				notesList=notesList.stream().filter(notecheck -> notecheck.getReminder() != null).collect(Collectors.toList());
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+		return notesList;
+	}
+	
+	@Override
+	public List<UserNotes> getTrash(String token) {
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		Optional<UserNotes> notes = null;
+		List<UserNotes> notesList = null;
+		if (userDetails.isPresent()) {
+			if (userDetails.get().isVarified()) {
+				notesList = userDetails.get().getNotes();
+				notesList=notesList.stream().filter(notecheck -> notecheck.isTrace()).collect(Collectors.toList());
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+		return notesList;
+	}
+	
+	@Override
+	public List<UserNotes> getArchivedNotes(String token) {
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		Optional<UserNotes> notes = null;
+		List<UserNotes> notesList = null;
+		if (userDetails.isPresent()) {
+			if (userDetails.get().isVarified()) {
+				notesList = userDetails.get().getNotes();
+				notesList=notesList.stream().filter(notecheck -> notecheck.isArchive()).collect(Collectors.toList());
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+		return notesList;
 	}
 
 }

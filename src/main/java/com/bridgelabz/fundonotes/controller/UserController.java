@@ -44,9 +44,12 @@ public class UserController {
 	private Note noteService;
 	@Autowired
 	private Label labelService;
+	
 	private UserDetails userDetails;
 	private String data = null;
 
+	// produces = { "application/json" }
+	
 	@PostMapping(value = "/login")
 	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
 		data = userService.userLogin(loginDto);
@@ -128,10 +131,23 @@ public class UserController {
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
+	@GetMapping("/getarchivednotes")
+	public ResponseEntity<List<UserNotes>> getArchivedNotes(@RequestHeader String token) {
+		System.out.println("inside getarchived notes method");
+		List<UserNotes> notes = noteService.getArchivedNotes(token);
+		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	}
+
 	@PutMapping("/trash")
-	public ResponseEntity<Boolean> ifTrash(@RequestHeader String token, @RequestParam Long noteId) {
+	public ResponseEntity<Boolean> ifTrash(@RequestParam Long noteId, @RequestHeader String token) {
 		noteService.isTrash(token, noteId);
 		return new ResponseEntity<Boolean>(HttpStatus.OK);
+	}
+
+	@GetMapping("/gettrash")
+	public ResponseEntity<List<UserNotes>> getTrash(@RequestHeader String token) {
+		List<UserNotes> notes = noteService.getTrash(token);
+		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
 	}
 
 	@PutMapping("/reminder")
@@ -140,6 +156,12 @@ public class UserController {
 			@RequestHeader String token, @RequestParam Long noteId) {
 		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
+	}
+
+	@GetMapping("/getreminder")
+	public ResponseEntity<List<UserNotes>> getReminders(@RequestHeader String token) {
+		List<UserNotes> notes = noteService.getReminder(token);
+		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping("/showallusers")
@@ -175,10 +197,12 @@ public class UserController {
 	}
 
 	@PutMapping("/changecolor/{color}")
-	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color,@RequestParam Long noteId, @RequestHeader String token) {
-		UserNotes notes = noteService.updateColor( color, token, noteId);
+	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color, @RequestParam Long noteId,
+			@RequestHeader String token) {
+		UserNotes notes = noteService.updateColor(color, token, noteId);
 		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
 	}
+
 	@GetMapping("/showallcolabrators")
 	public void colabratorList(@RequestBody String noteColabratorList) {
 	}

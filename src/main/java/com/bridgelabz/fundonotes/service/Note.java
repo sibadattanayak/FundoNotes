@@ -30,4 +30,10 @@ public interface Note {
 
 	UserNotes updateColor(String color, String token, Long noteId);
 
+	List<UserNotes> getReminder(String token);
+
+	List<UserNotes> getTrash(String token);
+
+	List<UserNotes> getArchivedNotes(String token);
+
 }
