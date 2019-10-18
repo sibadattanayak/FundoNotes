@@ -98,23 +98,25 @@ public class UserServiceImplementation implements Label, User, Note {
 		Long userId = util.jwtTokenParser(token);
 
 		if (userId.equals(null)) {
-			throw new CustomException(400, "User not found");
+			throw new CustomException(400, "User not found1");
 		}
+		
 		Optional<UserDetails> user = userDataRepository.findById(userId);
 		Optional<UserDetails> checkUser = userDataRepository.findByEmail(email);
 
 		if (!checkUser.isPresent()) {
-			throw new CustomException(400, "User not found");
+			throw new CustomException(400, "User not found2");
 		}
 		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
 				.findFirst();
 		if (!checkNote.isPresent()) {
-			throw new CustomException(400, "User not found");
+			throw new CustomException(400, "User not found3");
 		}
 		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
+		
 		if (collaboratedNote.isPresent()) {
-			throw new CustomException(400, "User not found");
+			throw new CustomException(400, "User not found4");
 		}
 
 		checkNote.get().getCollabratorUserList().remove(checkUser.get());
