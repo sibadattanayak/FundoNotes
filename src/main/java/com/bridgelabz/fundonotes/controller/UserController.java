@@ -51,14 +51,15 @@ public class UserController {
 	private UserDetails userDetails;
 	private String data = null;
 
-	@PostMapping(value = "/login", consumes = { "application/json" }, produces = { "application/json" })
+	// ,consumes = { "application/json" }, produces = { "application/json" }
+	@PostMapping(value = "/login")
 
 	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
 		data = userService.userLogin(loginDto);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
-	@PostMapping(value = "/registration", consumes = { "application/json" }, produces = { "application/json" })
+	@PostMapping(value = "/registration")
 
 	public ResponseEntity<UserDetails> registration(@RequestBody UserDataValidation userDataValidation) {
 		userDetails = userService.userRegistration(userDataValidation);

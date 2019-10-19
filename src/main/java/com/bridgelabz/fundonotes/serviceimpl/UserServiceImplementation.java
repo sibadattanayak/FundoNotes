@@ -90,6 +90,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		checkNote.get().getCollabratorUserList().add(checkUser.get());
 		userNoteRepository.save(checkNote.get());
 		userDataRepository.save(user.get());
+		userDataRepository.save(checkUser.get());
 		return "User Collaborated";
 	}
 
@@ -100,27 +101,33 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userId.equals(null)) {
 			throw new CustomException(400, "User not found1");
 		}
-		
+
 		Optional<UserDetails> user = userDataRepository.findById(userId);
 		Optional<UserDetails> checkUser = userDataRepository.findByEmail(email);
 
 		if (!checkUser.isPresent()) {
 			throw new CustomException(400, "User not found2");
 		}
-		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
-				.findFirst();
-		if (!checkNote.isPresent()) {
-			throw new CustomException(400, "User not found3");
-		}
+
+		/*
+		 * Optional<UserNotes> checkNote =
+		 * user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
+		 * .findFirst(); if (!checkNote.isPresent()) { throw new CustomException(400,
+		 * "User not found3"); }
+		 */
+		Optional<UserNotes> isPresent = userNoteRepository.findById(noteId);
+
 		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
-		
+
 		if (collaboratedNote.isPresent()) {
 			throw new CustomException(400, "User not found4");
 		}
 
-		checkNote.get().getCollabratorUserList().remove(checkUser.get());
-		userNoteRepository.save(checkNote.get());
+		isPresent.get().getCollabratorUserList().remove(checkUser.get());
+		checkUser.get().getCollabratorNoteList().remove(collaboratedNote.get());
+
+		userNoteRepository.save(isPresent.get());
 		userDataRepository.save(user.get());
 		return "User Collaborated";
 	}
@@ -139,19 +146,18 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
 			String url = "http://localhost:8081/fundonotes/verifyuser/";
-			//util.javaMail(userDetails.getEmail(), token, url);
+			// util.javaMail(userDetails.getEmail(), token, url);
 			try {
-				RabbitMessage msg=new RabbitMessage();
+				RabbitMessage msg = new RabbitMessage();
 				msg.setEmail(userDataValidation.getEmail());
 				msg.setLink(url);
 				msg.setToken(token);
-			 rabbitTemplate.convertAndSend(RabitMqConfig.EXCHANGE_NAME, RabitMqConfig.ROUTING_KEY, msg);
-			//jmsUtility.sendMail(registrationDto.getEmail(), token, url);
-			}catch(Exception e){
+				rabbitTemplate.convertAndSend(RabitMqConfig.EXCHANGE_NAME, RabitMqConfig.ROUTING_KEY, msg);
+				// jmsUtility.sendMail(registrationDto.getEmail(), token, url);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			
+
 			logger.info("varification mail is sent");
 		}
 		return userDetails;
@@ -476,7 +482,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		List<UserNotes> notes = null;
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
-				//notes = userDetails.get().getNotes();
+				// notes = userDetails.get().getNotes();
 				notes = userDetails.get().getNotes().stream().filter(data -> !data.isArchive() && !data.isTrace())
 						.collect(Collectors.toList());
 
@@ -561,25 +567,25 @@ public class UserServiceImplementation implements Label, User, Note {
 			throw new CustomException(102, "User not exist");
 		return userNote;
 	}
-	
+
 	@Override
-	public List<UserNotes> getReminder(String token) 
-	{
+	public List<UserNotes> getReminder(String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 		Optional<UserNotes> notes = null;
 		List<UserNotes> notesList = null;
 		if (userDetails.isPresent()) {
-			if (userDetails.get().isVarified()) {
+			if (userDetails.get().isVarified() && notes.get().getReminder() != null) {
 				notesList = userDetails.get().getNotes();
-				notesList=notesList.stream().filter(notecheck -> notecheck.getReminder() != null).collect(Collectors.toList());
+				notesList = notesList.stream().filter(notecheck -> notecheck.getReminder() != null)
+						.collect(Collectors.toList());
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
 			throw new CustomException(102, "User not exist");
 		return notesList;
 	}
-	
+
 	@Override
 	public List<UserNotes> getTrash(String token) {
 		Long userId = util.jwtTokenParser(token);
@@ -589,14 +595,14 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
 				notesList = userDetails.get().getNotes();
-				notesList=notesList.stream().filter(notecheck -> notecheck.isTrace()).collect(Collectors.toList());
+				notesList = notesList.stream().filter(notecheck -> notecheck.isTrace()).collect(Collectors.toList());
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
 			throw new CustomException(102, "User not exist");
 		return notesList;
 	}
-	
+
 	@Override
 	public List<UserNotes> getArchivedNotes(String token) {
 		Long userId = util.jwtTokenParser(token);
@@ -606,7 +612,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
 				notesList = userDetails.get().getNotes();
-				notesList=notesList.stream().filter(notecheck -> notecheck.isArchive()).collect(Collectors.toList());
+				notesList = notesList.stream().filter(notecheck -> notecheck.isArchive()).collect(Collectors.toList());
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
