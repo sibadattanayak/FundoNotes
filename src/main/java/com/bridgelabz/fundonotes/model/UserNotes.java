@@ -1,7 +1,6 @@
 package com.bridgelabz.fundonotes.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -134,6 +132,12 @@ public class UserNotes {
 		this.isPinned = isPinned;
 	}
 
+	
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "UserNote_Id")
+	private List<UserNoteLabel> label;
+
 	public List<UserNoteLabel> getLabel() {
 		return label;
 	}
@@ -142,15 +146,15 @@ public class UserNotes {
 		this.label = label;
 	}
 
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "UserNote_Id")
-	private List<UserNoteLabel> label = new ArrayList<UserNoteLabel>();
-
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Column(nullable = false)
-	@JoinColumn(name = "UserNote_Id")
-	private List<UserDetails> notesList = new ArrayList<UserDetails>();
-
+	
+	/*
+	 * @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	 * 
+	 * @Column(nullable = false)
+	 * 
+	 * @JoinColumn(name = "UserNote_Id") private List<UserDetails> notesList = new
+	 * ArrayList<UserDetails>();
+	 */
 	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<UserDetails> collabratorUserList;
@@ -163,11 +167,10 @@ public class UserNotes {
 		this.collabratorUserList = collabratorUserList;
 	}
 
-	public List<UserDetails> getNotesList() {
-		return notesList;
-	}
-
-	public void setNotesList(List<UserDetails> notesList) {
-		this.notesList = notesList;
-	}
+	/*
+	 * public List<UserDetails> getNotesList() { return notesList; }
+	 * 
+	 * public void setNotesList(List<UserDetails> notesList) { this.notesList =
+	 * notesList; }
+	 */
 }

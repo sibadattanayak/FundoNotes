@@ -12,9 +12,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.bridgelabz.fundonotes.configuration.RabitMqConfig;
 import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
@@ -52,9 +52,10 @@ public class UserServiceImplementation implements Label, User, Note {
 	private RabbitTemplate rabbitTemplate;
 	@Autowired
 	private RedisTemplate<Object, Object> redisTemplate;
-
+	private Label labelService;
 	private UserDetails userDetails;
 	private UserNoteValidation userNoteValidation;
+	@Autowired
 	private UserNoteLabelRepository labelRepository;
 	private String message = null;
 
@@ -66,7 +67,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-	@Transactional
+
 	public String addCollaborater(String token, String email, Long noteId) {
 		Long userId = util.jwtTokenParser(token);
 
@@ -174,7 +175,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-	@Transactional
+
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
@@ -186,6 +187,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails.isPresent() && userDetails.get().isVarified()
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
+			System.out.println("Redis >> " + redisTemplate.opsForValue().get(token));
 			redisTemplate.opsForValue().set(token, loginDto.getUserEmail());
 			logger.info(loginDto.getUserEmail() + " user logged in successfully");
 		} else {
@@ -197,7 +199,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-	@Transactional
+
 	public String userForgotPassword(String email) {
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
 		if (userDetails.isPresent()) {
@@ -474,7 +476,6 @@ public class UserServiceImplementation implements Label, User, Note {
 		List<UserNotes> notes = null;
 		if (userDetails.isPresent()) {
 			if (userDetails.get().isVarified()) {
-				// notes = userDetails.get().getNotes();
 				notes = userDetails.get().getNotes().stream().filter(data -> !data.isArchive() && !data.isTrace())
 						.collect(Collectors.toList());
 
@@ -625,4 +626,62 @@ public class UserServiceImplementation implements Label, User, Note {
 		return notesList;
 	}
 
+	@Override
+	public List<UserNotes> getNotesOnLabel(Long labelId, String token) {
+		Long userId = util.jwtTokenParser(token);
+		List<UserNotes> notes = null;
+		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
+		Optional<UserNoteLabel> labelModel = null;
+		if (userDetails.isPresent() && userDetails.get().isVarified()) {
+			labelModel = labelRepository.findById(labelId);
+			if (labelModel.isPresent()) {
+				notes = getMultipleNotesOfLabel(labelId);
+			}
+		}
+		return notes;
+	}
+
+	private List<UserNotes> getMultipleNotesOfLabel(Long labelId) {
+		ArrayList<UserNotes> notes1 = new ArrayList<UserNotes>();
+		List<Long> noteIds = labelRepository.findByLabelId(labelId);
+		if (!noteIds.isEmpty()) {
+			for (Long noteId : noteIds) {
+				System.out.println(noteId);
+				Optional<UserNotes> note = userNoteRepository.findById(noteId);
+				notes1.add(note.get());
+			}
+		}
+		return notes1;
+	}
+
+	@Override
+	public String listLabel(String token, Long noteId, UserNoteLabelValidation labelDto) {
+		Long verifiedUser = util.jwtTokenParser(token);
+		System.out.println("in service");
+		Optional<UserDetails> userModel = userDataRepository.findById(verifiedUser);
+		if (userModel.isPresent()) {
+			System.out.println("in user present");
+			Optional<UserNoteLabel> isLabelPresent = userModel.get().getLabelList().stream()
+					.filter(data -> data.getLabelName().equalsIgnoreCase(labelDto.getLabelName())).findFirst();
+			if (isLabelPresent.isPresent()) {
+				System.out.println("in label present");
+				Optional<UserNotes> noteModel = userNoteRepository.findById(noteId);
+				if (noteModel.isPresent()) {
+					System.out.println("in note present");
+
+					Optional<UserNoteLabel> isnotelabelPresent = noteModel.get().getLabel().stream()
+							.filter(data -> data.getLabelName().equalsIgnoreCase(labelDto.getLabelName())).findFirst();
+
+					if (isnotelabelPresent.isPresent()) {
+						throw new CustomException(HttpStatus.BAD_REQUEST.value(), "label already exist");
+					}
+					noteModel.get().getLabel().add(isLabelPresent.get());
+
+					userNoteRepository.save(noteModel.get());
+					return "label added to note";
+				}
+			}
+		}
+		return "user not present";
+	}
 }

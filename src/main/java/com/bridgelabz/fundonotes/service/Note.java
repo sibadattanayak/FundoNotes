@@ -3,6 +3,8 @@ package com.bridgelabz.fundonotes.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.bridgelabz.fundonotes.dto.UserLoginValidation;
+import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
 import com.bridgelabz.fundonotes.dto.UserNoteValidation;
 import com.bridgelabz.fundonotes.model.UserNotes;
 
@@ -35,7 +37,11 @@ public interface Note {
 	List<UserNotes> getTrash(String token);
 
 	List<UserNotes> getArchivedNotes(String token);
-	
-	List<String>  getAllCollaborators(Long noteId, String token);
+
+	List<String> getAllCollaborators(Long noteId, String token);
+
+	List<UserNotes> getNotesOnLabel(Long labelId, String token);
+
+	public String listLabel(String token, Long noteId, UserNoteLabelValidation labeldto);
 
 }

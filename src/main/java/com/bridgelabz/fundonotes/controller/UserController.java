@@ -233,5 +233,19 @@ public class UserController {
 		List<String> collaboratedUsers = noteService.getAllCollaborators(noteId, token);
 		return new ResponseEntity<List<String>>(collaboratedUsers, HttpStatus.OK);
 	}
+	@GetMapping("/getNotesOnLabel")
+	public List<UserNotes> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token){
+	System.out.println(labelId+"     ");
+	List<UserNotes> notes=noteService.getNotesOnLabel(labelId, token);
+	return notes;
+	}
+	
+	@PostMapping("/mappingNoteLabel")
+	public ResponseEntity<ApplicationResponse> listLabel(@RequestParam Long noteId,
+			@RequestBody UserNoteLabelValidation labeldto,@RequestHeader String token) {
+	String status= noteService.listLabel(token, noteId, labeldto);
+	ApplicationResponse response=new ApplicationResponse(HttpStatus.ACCEPTED.value(),status);
+	return new ResponseEntity<ApplicationResponse>(response,HttpStatus.OK);
+	}
 
 }
