@@ -84,7 +84,7 @@ public class Utility {
 			message.setFrom("sibadattanayak1996@gmail.com");
 			message.setTo(to);
 			message.setText(url + token);
-			message.setSubject("IsVerified Token");
+			message.setSubject("Mail From BridgeLabz");
 			mailSender.send(message);
 
 		} catch (Exception e) {

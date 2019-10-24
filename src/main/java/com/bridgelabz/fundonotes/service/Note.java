@@ -35,5 +35,7 @@ public interface Note {
 	List<UserNotes> getTrash(String token);
 
 	List<UserNotes> getArchivedNotes(String token);
+	
+	List<String>  getAllCollaborators(Long noteId, String token);
 
 }

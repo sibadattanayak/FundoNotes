@@ -11,6 +11,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,9 +50,12 @@ public class UserServiceImplementation implements Label, User, Note {
 	private UserNoteRepository userNoteRepository;
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	@Autowired
+	private RedisTemplate<Object, Object> redisTemplate;
 
 	private UserDetails userDetails;
 	private UserNoteValidation userNoteValidation;
+	private UserNoteLabelRepository labelRepository;
 	private String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
@@ -96,40 +100,30 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public String removeCollaborater(String token, String email, Long noteId) {
+
 		Long userId = util.jwtTokenParser(token);
 
 		if (userId.equals(null)) {
-			throw new CustomException(400, "User not found1");
+			throw new CustomException(400, "User not found 1");
 		}
-
 		Optional<UserDetails> user = userDataRepository.findById(userId);
 		Optional<UserDetails> checkUser = userDataRepository.findByEmail(email);
 
 		if (!checkUser.isPresent()) {
-			throw new CustomException(400, "User not found2");
+			throw new CustomException(400, "collaborated user not found 2");
 		}
-
-		/*
-		 * Optional<UserNotes> checkNote =
-		 * user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
-		 * .findFirst(); if (!checkNote.isPresent()) { throw new CustomException(400,
-		 * "User not found3"); }
-		 */
-		Optional<UserNotes> isPresent = userNoteRepository.findById(noteId);
+		Optional<UserNotes> notePresent = userNoteRepository.findById(noteId);
 
 		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
-
-		if (collaboratedNote.isPresent()) {
-			throw new CustomException(400, "User not found4");
+		if (!collaboratedNote.isPresent()) {
+			throw new CustomException(400, "collaborated note  not found 4");
 		}
-
-		isPresent.get().getCollabratorUserList().remove(checkUser.get());
+		notePresent.get().getCollabratorUserList().remove(checkUser.get());
 		checkUser.get().getCollabratorNoteList().remove(collaboratedNote.get());
-
-		userNoteRepository.save(isPresent.get());
+		userNoteRepository.save(notePresent.get());
 		userDataRepository.save(user.get());
-		return "User Collaborated";
+		return "collaborated user removed";
 	}
 
 	@Override
@@ -146,14 +140,13 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails != null) {
 			token = util.jwtToken(userDetails.getUserId());
 			String url = "http://localhost:8081/fundonotes/verifyuser/";
-			// util.javaMail(userDetails.getEmail(), token, url);
+
 			try {
 				RabbitMessage msg = new RabbitMessage();
 				msg.setEmail(userDataValidation.getEmail());
 				msg.setLink(url);
 				msg.setToken(token);
 				rabbitTemplate.convertAndSend(RabitMqConfig.EXCHANGE_NAME, RabitMqConfig.ROUTING_KEY, msg);
-				// jmsUtility.sendMail(registrationDto.getEmail(), token, url);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -193,6 +186,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (userDetails.isPresent() && userDetails.get().isVarified()
 				&& bCryptPasswordEncoder.matches(loginDto.getUserPassword(), userDetails.get().getPassword())) {
 			token = util.jwtToken(userDetails.get().getUserId());
+			redisTemplate.opsForValue().set(token, loginDto.getUserEmail());
 			logger.info(loginDto.getUserEmail() + " user logged in successfully");
 		} else {
 			logger.info("Login attempted --> " + loginDto.getUserEmail());
@@ -208,7 +202,7 @@ public class UserServiceImplementation implements Label, User, Note {
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(email);
 		if (userDetails.isPresent()) {
 			String token = util.jwtToken(userDetails.get().getUserId());
-			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:4200/resetpassword/:");
+			util.javaMail(userDetails.get().getEmail(), token, "http://localhost:3000/resetpassword/");
 			logger.info("API for forgotpassword has been sent to user's registered email");
 			message = "Sent to email";
 		} else {
@@ -227,7 +221,7 @@ public class UserServiceImplementation implements Label, User, Note {
 			UserDetails details = userDataRepository.getOne(userId);
 			if (details.isVarified() == true) {
 				details.setUpdateTime(LocalDateTime.now());
-				details.setPassword(bCryptPasswordEncoder.encode(password.getPasword()));
+				details.setPassword(bCryptPasswordEncoder.encode(password.getPassword()));
 				userDataRepository.save(details);
 				message = "Verified successfully";
 				logger.info("User resetPassword successfully");
@@ -312,8 +306,6 @@ public class UserServiceImplementation implements Label, User, Note {
 		}
 		return notes.get();
 	}
-
-	UserNoteLabelRepository labelRepository;
 
 	@Override
 	public List<UserNoteLabel> createLabel(UserNoteLabelValidation labelDto, String token) {
@@ -529,23 +521,36 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	}
 
+	private List<UserNotes> getCollaboratedNoteForUser(Long userId) {
+		List<UserNotes> collaborateNotes = new ArrayList<UserNotes>();
+		List<Long> collaboratednoteId = userNoteRepository.findBycollabratorUserList(userId);
+		if (collaboratednoteId == null) {
+			throw new CustomException(404, "list is empty");
+		}
+		for (Long noteid : collaboratednoteId) {
+			Optional<UserNotes> collaboratedNote = userNoteRepository.findById(noteid);
+			collaborateNotes.add(collaboratedNote.get());
+		}
+
+		return collaborateNotes;
+	}
+
 	@Override
-	public List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token) {
-		return null;
-		/*
-		 * Long userId = util.jwtTokenParser(token); Optional<User> user =
-		 * checkUser(userId); // Optional<Notes> optionalNote =
-		 * notesRepository.findById(noteId); // if (!optionalNote.isPresent()) { //
-		 * throw new UserException("Note not Found"); // } UserNotes note =
-		 * user.get().getListofNotes().stream().filter(checkNote ->
-		 * checkNote.getNoteId().equals(noteId)) .findFirst().orElseThrow(() -> new
-		 * UserException("Note not found")); List<Collaborator> listOfCollaboratedUser =
-		 * userCollaboratorRepository.findByNoteId(note.getId()); List<String>
-		 * userEmailList = new ArrayList<String>();
-		 * listOfCollaboratedUser.forEach(collaboratedUser -> { Optional<User> user2 =
-		 * userRepository.findById(collaboratedUser.getUser_id());
-		 * userEmailList.add(user2.get().getEmailId()); }); return userEmailList;
-		 */
+	public List<String> getAllCollaborators(Long noteId, String token) {
+
+		Long userId = util.jwtTokenParser(token);
+		ArrayList<String> collabUserList = new ArrayList<String>();
+		Optional<UserDetails> userModel = userDataRepository.findById(userId);
+		if (!userModel.isPresent()) {
+			throw new CustomException(400, "User not found 1");
+		}
+		List<Long> collaUserIds = userNoteRepository.findBycollabratorNoteId(noteId);
+		for (Long eachUserId : collaUserIds) {
+			Optional<UserDetails> user = userDataRepository.findById(eachUserId);
+			collabUserList.add(user.get().getEmail());
+		}
+		return collabUserList;
+
 	}
 
 	@Override

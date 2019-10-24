@@ -19,8 +19,6 @@ public interface User {
 
 	String userVarification(String token);
 
-	List<UserDataValidation> showNoteColabratorList(UserDataValidation userDataValidation, String token);
-
 	List<UserDetails> showUserList(String token);
 
 }

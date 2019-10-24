@@ -1,0 +1,68 @@
+2019-10-18 19:09:54 INFO  UserServiceImplementation:197 - shibadattanayak@hotmail.com user logged in successfully
+2019-10-18 19:09:54 INFO  UserServiceImplementation:202 - Login attempted with email - shibadattanayak@hotmail.com
+2019-10-18 19:17:33 INFO  UserServiceImplementation:198 - shibadattanayak@gmail.com user logged in successfully
+2019-10-18 19:17:33 INFO  UserServiceImplementation:203 - Login attempted with email - shibadattanayak@gmail.com
+2019-10-19 09:48:11 INFO  UserServiceImplementation:198 - shibadattanayak@gmail.com user logged in successfully
+2019-10-19 09:48:11 INFO  UserServiceImplementation:203 - Login attempted with email - shibadattanayak@gmail.com
+2019-10-19 09:48:11 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 09:48:11 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:02:49 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:02:49 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:10:31 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:10:31 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:10:48 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:10:48 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:10:59 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:10:59 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:11:11 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:11:11 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:11:21 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:11:21 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:11:32 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:11:32 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:11:36 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:11:36 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:11:57 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:11:57 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:12:21 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:12:21 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:12:26 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:12:26 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:12:44 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:12:44 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:12:51 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:12:51 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:12:59 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:12:59 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:13:08 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:13:08 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:13:41 INFO  UserServiceImplementation:270 - UserId for creating notes >> 1
+2019-10-19 10:13:47 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:13:47 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:18:14 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:18:14 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 10:18:34 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 10:18:34 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 11:21:14 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 11:21:14 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 11:28:35 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 11:28:35 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 11:29:54 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 11:29:54 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 11:30:02 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 11:30:02 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 12:18:50 INFO  UserServiceImplementation:516 - Inside User's lable list 
+2019-10-19 12:18:50 INFO  UserServiceImplementation:521 - User lables found 
+2019-10-19 12:24:50 INFO  UserServiceImplementation:514 - Inside User's lable list 
+2019-10-19 12:24:50 INFO  UserServiceImplementation:519 - User lables found 
+2019-10-19 12:25:31 INFO  UserServiceImplementation:514 - Inside User's lable list 
+2019-10-19 12:25:31 INFO  UserServiceImplementation:519 - User lables found 
+2019-10-19 14:44:29 INFO  UserServiceImplementation:410 - User is present
+2019-10-19 14:44:29 INFO  UserServiceImplementation:413 - User note is Archive 
+2019-10-19 14:44:29 INFO  UserServiceImplementation:417 - User note is removed from Archive 
+2019-10-19 14:44:40 INFO  UserServiceImplementation:439 - User note is present
+2019-10-19 14:44:40 INFO  UserServiceImplementation:442 - User note is in Trace 
+2019-10-19 14:44:40 INFO  UserServiceImplementation:446 - User note is removed from Trace 
+2019-10-19 14:44:47 INFO  UserServiceImplementation:514 - Inside User's lable list 
+2019-10-19 14:44:47 INFO  UserServiceImplementation:519 - User lables found 
+2019-10-19 14:45:58 INFO  UserServiceImplementation:257 - Note created successfully

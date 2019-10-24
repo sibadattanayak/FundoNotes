@@ -117,7 +117,7 @@ public class UserController {
 		return new ResponseEntity<List<UserNoteLabel>>(noteLabel, HttpStatus.CREATED);
 	}
 
-	@PutMapping(value = "/updatelabel/{labelid}")
+	@PutMapping(value = "/updatelabel")
 
 	public ResponseEntity<UserNoteLabel> updateLabel(@RequestBody UserNoteLabelValidation noteLabelValidation,
 			@RequestHeader String token) {
@@ -125,7 +125,7 @@ public class UserController {
 		return new ResponseEntity<UserNoteLabel>(noteLabel, HttpStatus.OK);
 	}
 
-	@DeleteMapping(value = "/deletelabel/{labelid}")
+	@DeleteMapping(value = "/deletelabel")
 
 	public void deleteLabel(@RequestBody Long labelId, @RequestHeader String token) {
 		labelService.deleteLabel(labelId, token);
@@ -229,7 +229,9 @@ public class UserController {
 
 	@GetMapping(value = "/showallcolabrators")
 
-	public void colabratorList(@RequestBody String noteColabratorList) {
+	public ResponseEntity<List<String>> colabratorList(@RequestParam Long noteId, @RequestHeader String token) {
+		List<String> collaboratedUsers = noteService.getAllCollaborators(noteId, token);
+		return new ResponseEntity<List<String>>(collaboratedUsers, HttpStatus.OK);
 	}
 
 }

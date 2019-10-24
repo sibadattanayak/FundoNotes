@@ -1,14 +1,14 @@
 package com.bridgelabz.fundonotes.dto;
 
 public class ResetPasswordDTO {
-private String pasword;
+private String password;
 
-public String getPasword() {
-	return pasword;
+public String getPassword() {
+	return password;
 }
 
-public void setPasword(String pasword) {
-	this.pasword = pasword;
+public void setPassword(String password) {
+	this.password = password;
 }
 
 }
