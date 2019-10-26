@@ -52,11 +52,16 @@ public class UserServiceImplementation implements Label, User, Note {
 	private RabbitTemplate rabbitTemplate;
 	@Autowired
 	private RedisTemplate<Object, Object> redisTemplate;
+	@Autowired
 	private Label labelService;
-	private UserDetails userDetails;
-	private UserNoteValidation userNoteValidation;
 	@Autowired
 	private UserNoteLabelRepository labelRepository;
+	/*
+	 * @Autowired private ElasticSearchServiceImpl elasticSearchService;
+	 */
+	private UserDetails userDetails;
+	private UserNoteValidation userNoteValidation;
+
 	private String message = null;
 
 	private static Logger logger = Logger.getLogger(UserServiceImplementation.class);
@@ -251,6 +256,7 @@ public class UserServiceImplementation implements Label, User, Note {
 			userDetails.get().getNotesList().add(notes);
 			userDataRepository.save(userDetails.get());
 			logger.info("Note created successfully");
+			// elasticSearchService.createNote(notes);
 			return userDetails.get().getNotesList();
 		} else
 			logger.info("Note couldn't be created");
@@ -268,6 +274,7 @@ public class UserServiceImplementation implements Label, User, Note {
 			if (notes.isPresent() && userDetails.get().isVarified()) {
 				if (userNote.getNoteTitle() != null) {
 					notes.get().setNoteTitle(userNote.getNoteTitle());
+
 				} else {
 					logger.info("User notes data not found");
 					throw new CustomException(104, "Invalid User or User Not verified");
@@ -279,7 +286,9 @@ public class UserServiceImplementation implements Label, User, Note {
 					throw new CustomException(104, "Invalid User or NoteDescription is null");
 				}
 				notes.get().setNoteUpdateTime(LocalDateTime.now());
+
 				userNoteRepository.save(notes.get());
+				// elasticSearchService.updateNote(notes.get());
 			} else {
 				throw new CustomException(104, "Invalid User or Token");
 			}
@@ -293,11 +302,12 @@ public class UserServiceImplementation implements Label, User, Note {
 		Optional<UserDetails> userDetails = userDataRepository.findById(userId);
 		Optional<UserNotes> notes = null;
 
-		if (userDetails.isPresent() && userId != null) {
+		if (userDetails.isPresent()) {
 			notes = userNoteRepository.findById(noteId);
 			if (notes.isPresent() && userDetails.get().isVarified()) {
 				userNoteRepository.deleteById(noteId);
 				logger.info("User note deleted successfully");
+				// elasticSearchService.deleteNote(notes.get());
 			} else {
 				logger.info("User not found or invalid token");
 				throw new CustomException(104, "Invalid token or user not found");

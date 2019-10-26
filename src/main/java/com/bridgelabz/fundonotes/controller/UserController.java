@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +44,9 @@ public class UserController {
 	private Note noteService;
 	@Autowired
 	private Label labelService;
-
+	/*
+	 * @Autowired private ElasticSearchServiceImpl elasticService;
+	 */
 	private UserDetails userDetails;
 	private String data = null;
 
@@ -233,19 +232,26 @@ public class UserController {
 		List<String> collaboratedUsers = noteService.getAllCollaborators(noteId, token);
 		return new ResponseEntity<List<String>>(collaboratedUsers, HttpStatus.OK);
 	}
+
 	@GetMapping("/getNotesOnLabel")
-	public List<UserNotes> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token){
-	System.out.println(labelId+"     ");
-	List<UserNotes> notes=noteService.getNotesOnLabel(labelId, token);
-	return notes;
+	public List<UserNotes> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token) {
+		System.out.println(labelId + "     ");
+		List<UserNotes> notes = noteService.getNotesOnLabel(labelId, token);
+		return notes;
 	}
-	
+
 	@PostMapping("/mappingNoteLabel")
 	public ResponseEntity<ApplicationResponse> listLabel(@RequestParam Long noteId,
-			@RequestBody UserNoteLabelValidation labeldto,@RequestHeader String token) {
-	String status= noteService.listLabel(token, noteId, labeldto);
-	ApplicationResponse response=new ApplicationResponse(HttpStatus.ACCEPTED.value(),status);
-	return new ResponseEntity<ApplicationResponse>(response,HttpStatus.OK);
+			@RequestBody UserNoteLabelValidation labeldto, @RequestHeader String token) {
+		String status = noteService.listLabel(token, noteId, labeldto);
+		ApplicationResponse response = new ApplicationResponse(HttpStatus.ACCEPTED.value(), status);
+		return new ResponseEntity<ApplicationResponse>(response, HttpStatus.OK);
 	}
+
+	/*
+	 * @GetMapping("/search_note") public List<UserNotes>
+	 * searchNoteByData(@RequestParam String data) { return
+	 * elasticService.searchNoteByData(data); }
+	 */
 
 }
