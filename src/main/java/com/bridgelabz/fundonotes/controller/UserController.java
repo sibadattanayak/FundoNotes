@@ -51,9 +51,10 @@ public class UserController {
 	private String data = null;
 
 	// ,consumes = { "application/json" }, produces = { "application/json" }
-	@PostMapping(value = "/login")
-
+	
+	@PostMapping(value = "/login") 
 	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
+		System.out.println("inside login method : "+loginDto.getUserEmail()+" : "+loginDto.getUserPassword());
 		data = userService.userLogin(loginDto);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
@@ -96,7 +97,7 @@ public class UserController {
 	@PutMapping(value = "/updatenote")
 
 	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNotes userNotes, @RequestHeader String token) {
-		System.out.println("Inside update Notes");
+		
 		UserNotes userNote = noteService.updateNote(userNotes, token);
 		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
 	}
@@ -110,7 +111,7 @@ public class UserController {
 
 	@PostMapping(value = "/createlabel")
 
-	public ResponseEntity<List<UserNoteLabel>> createLabel(@RequestBody UserNoteLabelValidation labelDto,
+	public ResponseEntity<List<UserNoteLabel>> createLabel(@RequestParam UserNoteLabelValidation labelDto,
 			@RequestHeader String token) {
 		List<UserNoteLabel> noteLabel = labelService.createLabel(labelDto, token);
 		return new ResponseEntity<List<UserNoteLabel>>(noteLabel, HttpStatus.CREATED);
@@ -118,7 +119,7 @@ public class UserController {
 
 	@PutMapping(value = "/updatelabel")
 
-	public ResponseEntity<UserNoteLabel> updateLabel(@RequestBody UserNoteLabelValidation noteLabelValidation,
+	public ResponseEntity<UserNoteLabel> updateLabel(@RequestParam UserNoteLabelValidation noteLabelValidation,
 			@RequestHeader String token) {
 		UserNoteLabel noteLabel = labelService.updateLabel(noteLabelValidation, token);
 		return new ResponseEntity<UserNoteLabel>(noteLabel, HttpStatus.OK);
@@ -126,13 +127,13 @@ public class UserController {
 
 	@DeleteMapping(value = "/deletelabel")
 
-	public void deleteLabel(@RequestBody Long labelId, @RequestHeader String token) {
+	public void deleteLabel(@RequestParam Long labelId, @RequestHeader String token) {
 		labelService.deleteLabel(labelId, token);
 	}
 
 	@PutMapping(value = "/pinned")
 
-	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token, @RequestHeader Long noteId) {
+	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token, @RequestParam Long noteId) {
 		noteService.isPinned(token, noteId);
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}

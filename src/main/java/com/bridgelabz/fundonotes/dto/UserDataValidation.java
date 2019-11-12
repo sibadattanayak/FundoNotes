@@ -11,6 +11,22 @@ import com.bridgelabz.fundonotes.util.Utility;
 
 public class UserDataValidation {
 
+	public UserDataValidation() {
+		
+		
+	}
+
+	public UserDataValidation(@NotEmpty(message = "Please provide your first name") String firstName,
+			@NotEmpty(message = "Please provide your last name") String lastName,
+			@Email @NotEmpty(message = "Please provide your email") String email,
+			@NotEmpty(message = "Please provide your password") @Size(min = 3, max = 10, message = "Your password must have at least 3-10 characters") String password) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+	}
+
 	@NotEmpty(message = "Please provide your first name")
 	private String firstName;
 

@@ -38,7 +38,7 @@ import com.bridgelabz.fundonotes.util.Utility;
 @Service
 public class UserServiceImplementation implements Label, User, Note {
 
-	@Autowired
+	
 	private UserDataRepository userDataRepository;
 	@Autowired
 	private ModelMapper modelMapper;
@@ -46,7 +46,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	private Utility util;
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	@Autowired
+	
 	private UserNoteRepository userNoteRepository;
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
@@ -54,7 +54,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	private RedisTemplate<Object, Object> redisTemplate;
 	@Autowired
 	private Label labelService;
-	@Autowired
+
 	private UserNoteLabelRepository labelRepository;
 	/*
 	 * @Autowired private ElasticSearchServiceImpl elasticSearchService;
@@ -85,15 +85,14 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (!checkUser.isPresent()) {
 			throw new CustomException(400, "User not found 2");
 		}
-		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
-				.findFirst();
+		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId).findFirst();
 		if (!checkNote.isPresent()) {
 			throw new CustomException(400, "User not found 4");
 		}
 		Optional<UserNotes> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
 		if (collaboratedNote.isPresent()) {
-			throw new CustomException(400, "User not found 5");
+			throw new CustomException(400, "User already collaborated");
 		}
 		user.get().getCollabratorNoteList().add(checkNote.get());
 		checkUser.get().getCollabratorNoteList().add(checkNote.get());
@@ -184,6 +183,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
+		System.out.println("inside serviceimpl  method : "+loginDto.getUserEmail()+" : "+loginDto.getUserPassword());
 
 		if (!userDetails.isPresent()) {
 			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());

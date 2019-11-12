@@ -21,6 +21,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "User_Notes")
 public class UserNotes {
+	public UserNotes(Long id, String color, String noteDescription, String noteTitle, LocalDateTime noteCreateTime,
+			LocalDateTime noteUpdateTime, LocalDateTime reminder, boolean isTrace, boolean isArchive, boolean isPinned,
+			List<UserNoteLabel> label, List<UserDetails> collabratorUserList) {
+		super();
+		this.id = id;
+		this.color = color;
+		this.noteDescription = noteDescription;
+		this.noteTitle = noteTitle;
+		this.noteCreateTime = noteCreateTime;
+		this.noteUpdateTime = noteUpdateTime;
+		this.reminder = reminder;
+		this.isTrace = isTrace;
+		this.isArchive = isArchive;
+		this.isPinned = isPinned;
+		this.label = label;
+		this.collabratorUserList = collabratorUserList;
+	}
+
 	@Id
 	@Column(name = "UserNote_Id")
 	@GeneratedValue(strategy = GenerationType.AUTO)

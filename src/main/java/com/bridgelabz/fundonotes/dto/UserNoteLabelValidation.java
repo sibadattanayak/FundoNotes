@@ -11,4 +11,9 @@ public class UserNoteLabelValidation {
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
+
+	public UserNoteLabelValidation(String labelName) {
+		super();
+		this.labelName = labelName;
+	}
 }

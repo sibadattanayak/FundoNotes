@@ -58,7 +58,31 @@ public class UserDetails {
 
 	@Column(name = "isVarified")
 	private boolean isVarified;
+	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Column(nullable = false)
+	@JoinColumn(name = "User_Id")
+	private List<UserNotes> notesList = new ArrayList<UserNotes>();
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@Column(nullable = false)
+	@JoinColumn(name = "User_Id")
+	private List<UserNoteLabel> labelList = new ArrayList<UserNoteLabel>();
+
+	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "collabratorUserList")
+	@JsonIgnore
+	private List<UserNotes> collabratorNoteList;
+
+
+	public void setIsVarified(boolean isVarified) {
+		this.isVarified = isVarified;
+	}
+
+	
+	
+	
+	
+	
 	public LocalDateTime getUpdateTime() {
 		return updateTime;
 	}
@@ -122,20 +146,6 @@ public class UserDetails {
 	public void setVarified(boolean isVarified) {
 		this.isVarified = isVarified;
 	}
-
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Column(nullable = false)
-	@JoinColumn(name = "User_Id")
-	private List<UserNotes> notesList = new ArrayList<UserNotes>();
-
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@Column(nullable = false)
-	@JoinColumn(name = "User_Id")
-	private List<UserNoteLabel> labelList = new ArrayList<UserNoteLabel>();
-
-	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "collabratorUserList")
-	@JsonIgnore
-	private List<UserNotes> collabratorNoteList;
 
 	public List<UserNotes> getCollabratorNoteList() {
 		return collabratorNoteList;

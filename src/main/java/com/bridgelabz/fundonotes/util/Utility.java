@@ -81,7 +81,7 @@ public class Utility {
 
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
-			message.setFrom("sibadattanayak1996@gmail.com");
+			message.setFrom("shibadattanayak@gmail.com");
 			message.setTo(to);
 			message.setText(url + token);
 			message.setSubject("Mail From BridgeLabz");

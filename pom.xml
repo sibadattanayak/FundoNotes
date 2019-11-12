@@ -20,12 +20,9 @@
 	</properties>
 
 	<dependencies>
-		
-		<!-- <dependency>
-			<groupId> org.elasticsearch.client</groupId>
-			<artifactId>elasticsearch-rest-high-level-client</artifactId>
-			<version>6.4.3</version>
-		</dependency> -->
+
+		<!-- <dependency> <groupId> org.elasticsearch.client</groupId> <artifactId>elasticsearch-rest-high-level-client</artifactId> 
+			<version>6.4.3</version> </dependency> -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -41,13 +38,12 @@
 			<version>2.9.2</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-redis -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-redis</artifactId>
 			<version>1.4.7.RELEASE</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
