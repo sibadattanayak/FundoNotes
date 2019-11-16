@@ -11,7 +11,6 @@ import com.bridgelabz.fundonotes.response.ApplicationResponse;
 public class ExceptionHandller {
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ApplicationResponse> userException(CustomException e) {
-
 		ApplicationResponse applicationResponse = new ApplicationResponse();
 		applicationResponse.setDescription(e.getDescription());
 		applicationResponse.setStatusCode(e.getStatusCode());
@@ -20,12 +19,10 @@ public class ExceptionHandller {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApplicationResponse> defaultException(Exception e) {
-
 		ApplicationResponse applicationResponse = new ApplicationResponse();
 		applicationResponse.setDescription(e.getMessage());
-		applicationResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
-		return new ResponseEntity<ApplicationResponse>(applicationResponse, HttpStatus.BAD_REQUEST);
+		applicationResponse.setStatusCode(HttpStatus.CONTINUE.value());
+		return new ResponseEntity<ApplicationResponse>(applicationResponse, HttpStatus.CONTINUE);
 	}
-
 }
  

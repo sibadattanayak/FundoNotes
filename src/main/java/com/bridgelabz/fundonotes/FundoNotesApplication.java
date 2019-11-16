@@ -6,8 +6,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 
-//(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
+
+
 @SpringBootApplication
+//(exclude = {DataSourceAutoConfiguration.class, XADataSourceAutoConfiguration.class})
 @EnableCaching
 public class FundoNotesApplication {
 	public static void main(String[] args) {

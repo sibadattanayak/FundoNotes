@@ -11,7 +11,7 @@ public class UserNoteValidation {
 	private boolean isTrace;
 	public UserNoteValidation(String noteDescription, String noteTitle, LocalDateTime reminder, boolean isTrace,
 			boolean isArcive, boolean isPinned, String color) {
-		super();
+		
 		this.noteDescription = noteDescription;
 		this.noteTitle = noteTitle;
 		this.reminder = reminder;
@@ -19,6 +19,11 @@ public class UserNoteValidation {
 		this.isArcive = isArcive;
 		this.isPinned = isPinned;
 		this.color = color;
+	}
+
+	public UserNoteValidation() {
+		
+		
 	}
 
 	private boolean isArcive;

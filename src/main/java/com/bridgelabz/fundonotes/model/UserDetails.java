@@ -15,10 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @NotNull
@@ -31,22 +28,38 @@ public class UserDetails {
 	@Column(name = "User_Id")
 	private Long userId;
 
+	public UserDetails(Long userId, String firstName, String lastName, String email, String password,
+			LocalDateTime createTime, LocalDateTime updateTime, boolean isVarified, List<UserNotes> notesList,
+			List<UserNoteLabel> labelList, List<UserNotes> collabratorNoteList) {
+
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.isVarified = isVarified;
+		this.notesList = notesList;
+		this.labelList = labelList;
+		this.collabratorNoteList = collabratorNoteList;
+	}
+
 	@Column(name = "FirstName", nullable = false)
 	private String firstName;
 
 	@Column(name = "LastName")
 	private String lastName;
 
-	//@Email
+	// @Email
 	@Column(name = "Email", unique = true, nullable = false)
 	private String email;
 
 	/*
-	 * @Pattern.List({ @Pattern(regexp = "(?=.*[0-9])", message =
-	 * "Password must contain one digit.")
+	 * @Pattern.List({ @Pattern(regexp = "(?=.*[0-9])", message = "Password must contain one digit.")
 	 */
 
-	//@Size(min = 3, max = 10, message = "Password Length must be between 3 to 10")
+	// @Size(min = 3, max = 10, message = "Password Length must be between 3 to 10")
 	@Column(name = "Password", nullable = false)
 	private String password;
 
@@ -58,7 +71,7 @@ public class UserDetails {
 
 	@Column(name = "isVarified")
 	private boolean isVarified;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Column(nullable = false)
 	@JoinColumn(name = "User_Id")
@@ -72,17 +85,17 @@ public class UserDetails {
 	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "collabratorUserList")
 	@JsonIgnore
 	private List<UserNotes> collabratorNoteList;
-
+	
+	
+	public UserDetails() {
+		this.collabratorNoteList = new ArrayList<>();
+		// TODO Auto-generated constructor stub
+	}
 
 	public void setIsVarified(boolean isVarified) {
 		this.isVarified = isVarified;
 	}
 
-	
-	
-	
-	
-	
 	public LocalDateTime getUpdateTime() {
 		return updateTime;
 	}

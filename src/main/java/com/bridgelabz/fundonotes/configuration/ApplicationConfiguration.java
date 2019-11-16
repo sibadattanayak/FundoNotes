@@ -1,7 +1,6 @@
 package com.bridgelabz.fundonotes.configuration;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration.AccessLevel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -9,8 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import com.bridgelabz.fundonotes.serviceimpl.UserServiceImplementation;
 
 @Configuration
 public class ApplicationConfiguration implements WebMvcConfigurer {
@@ -24,7 +21,7 @@ public class ApplicationConfiguration implements WebMvcConfigurer {
 	@Bean
 	public ModelMapper getModelMapping() {
 		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.getConfiguration().setMethodAccessLevel(AccessLevel.PROTECTED);
+//		modelMapper.getConfiguration().setMethodAccessLevel(AccessLevel.PROTECTED);
 		return modelMapper;
 	}
 

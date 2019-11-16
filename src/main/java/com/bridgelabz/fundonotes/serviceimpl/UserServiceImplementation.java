@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bridgelabz.fundonotes.configuration.RabitMqConfig;
 import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
@@ -38,7 +39,7 @@ import com.bridgelabz.fundonotes.util.Utility;
 @Service
 public class UserServiceImplementation implements Label, User, Note {
 
-	
+	@Autowired
 	private UserDataRepository userDataRepository;
 	@Autowired
 	private ModelMapper modelMapper;
@@ -46,7 +47,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	private Utility util;
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
 	private UserNoteRepository userNoteRepository;
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
@@ -59,6 +60,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	/*
 	 * @Autowired private ElasticSearchServiceImpl elasticSearchService;
 	 */
+
 	private UserDetails userDetails;
 	private UserNoteValidation userNoteValidation;
 
@@ -85,7 +87,8 @@ public class UserServiceImplementation implements Label, User, Note {
 		if (!checkUser.isPresent()) {
 			throw new CustomException(400, "User not found 2");
 		}
-		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId).findFirst();
+		Optional<UserNotes> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
+				.findFirst();
 		if (!checkNote.isPresent()) {
 			throw new CustomException(400, "User not found 4");
 		}
@@ -132,33 +135,40 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-
+	@Transactional
 	public UserDetails userRegistration(UserDataValidation userDataValidation) {
-		userDetails = modelMapper.map(userDataValidation, UserDetails.class);
-		userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
-		userDetails.setCreateTime(LocalDateTime.now());
-		userDetails.setUpdateTime(LocalDateTime.now());
-		userDetails.setVarified(false);
-		userDetails = userDataRepository.save(userDetails);
-		logger.info("User Registered Successfully");
-		String token = null;
-		if (userDetails != null) {
-			token = util.jwtToken(userDetails.getUserId());
-			String url = "http://localhost:8081/fundonotes/verifyuser/";
+		try {
+			Optional<UserDetails> findMail = userDataRepository.findByEmail(userDataValidation.getEmail());
+			if (findMail.isPresent())
+				throw new CustomException(302, "User Already Registered with this mail");
+			UserDetails userDetails = modelMapper.map(userDataValidation, UserDetails.class);
 
-			try {
+			userDetails.setPassword(bCryptPasswordEncoder.encode(userDetails.getPassword()));
+			userDetails.setCreateTime(LocalDateTime.now());
+			userDetails.setUpdateTime(LocalDateTime.now());
+			userDetails.setVarified(false);
+
+			UserDetails userDetails1 = userDataRepository.save(userDetails);
+			System.out.println("reg2: " + userDetails);
+			logger.info("User Registered Successfully");
+			String token = null;
+			if (userDetails1 != null) {
+				token = util.jwtToken(userDetails1.getUserId());
+				String url = "http://localhost:8081/fundonotes/verifyuser/";
+
 				RabbitMessage msg = new RabbitMessage();
 				msg.setEmail(userDataValidation.getEmail());
 				msg.setLink(url);
 				msg.setToken(token);
 				rabbitTemplate.convertAndSend(RabitMqConfig.EXCHANGE_NAME, RabitMqConfig.ROUTING_KEY, msg);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+				logger.info("varification mail is sent");
+				return userDetails1;
 
-			logger.info("varification mail is sent");
+			}
+		} catch (Exception e) {
+			throw new InternalError("", e);
 		}
-		return userDetails;
+		return null;
 	}
 
 	@Override
@@ -179,11 +189,14 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-
+	@Transactional
 	public String userLogin(UserLoginValidation loginDto) {
 		String token = null;
+		System.out.println(
+				"inside serviceimpl  method1 : " + loginDto.getUserEmail() + " : " + loginDto.getUserPassword());
 		Optional<UserDetails> userDetails = userDataRepository.findByEmail(loginDto.getUserEmail());
-		System.out.println("inside serviceimpl  method : "+loginDto.getUserEmail()+" : "+loginDto.getUserPassword());
+		System.out.println(
+				"inside serviceimpl  method2 : " + loginDto.getUserEmail() + " : " + loginDto.getUserPassword());
 
 		if (!userDetails.isPresent()) {
 			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());

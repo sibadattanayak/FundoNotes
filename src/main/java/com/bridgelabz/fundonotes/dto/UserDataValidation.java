@@ -4,23 +4,17 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.bridgelabz.fundonotes.model.UserDetails;
-import com.bridgelabz.fundonotes.util.Utility;
-
 public class UserDataValidation {
 
 	public UserDataValidation() {
-		
-		
+
 	}
 
 	public UserDataValidation(@NotEmpty(message = "Please provide your first name") String firstName,
 			@NotEmpty(message = "Please provide your last name") String lastName,
 			@Email @NotEmpty(message = "Please provide your email") String email,
 			@NotEmpty(message = "Please provide your password") @Size(min = 3, max = 10, message = "Your password must have at least 3-10 characters") String password) {
-		super();
+
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -72,5 +66,10 @@ public class UserDataValidation {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "UserDataValidation [firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", password=" + password + "]";
+	}
 }

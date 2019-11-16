@@ -51,30 +51,29 @@ public class UserController {
 	private String data = null;
 
 	// ,consumes = { "application/json" }, produces = { "application/json" }
-	
-	@PostMapping(value = "/login") 
+
+	@PostMapping(value = "/login")
 	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
-		System.out.println("inside login method : "+loginDto.getUserEmail()+" : "+loginDto.getUserPassword());
+		
 		data = userService.userLogin(loginDto);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PostMapping(value = "/registration")
-
-	public ResponseEntity<UserDetails> registration(@RequestBody UserDataValidation userDataValidation) {
+	public ResponseEntity<ApplicationResponse> registration(@RequestBody UserDataValidation userDataValidation) {
+		
 		userDetails = userService.userRegistration(userDataValidation);
-		return new ResponseEntity<UserDetails>(userDetails, HttpStatus.OK);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), userDetails));
 	}
 
 	@PutMapping(value = "/forgotpassword")
-
 	public ResponseEntity<ApplicationResponse> userForgotPassword(@RequestBody ForgetPasswordDTO forgetPasswordto) {
 		data = userService.userForgotPassword(forgetPasswordto.getEmail());
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PutMapping(value = "/resetpassword")
-
 	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody ResetPasswordDTO password,
 			@RequestHeader String token) {
 		data = userService.userResetPassword(password, token);
@@ -82,8 +81,8 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/verifyuser/{token}")
-	public void varifyUser(@PathVariable String token) {
-		userService.userVarification(token);
+	public String varifyUser(@PathVariable String token) {
+		return "User Verified Successfully >>> " + userService.userVarification(token);
 	}
 
 	@PostMapping(value = "/createnote")
@@ -97,7 +96,7 @@ public class UserController {
 	@PutMapping(value = "/updatenote")
 
 	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNotes userNotes, @RequestHeader String token) {
-		
+
 		UserNotes userNote = noteService.updateNote(userNotes, token);
 		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
 	}

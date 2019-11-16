@@ -8,8 +8,11 @@ public class UserLoginValidation {
 		return userEmail;
 	}
 
+	public UserLoginValidation() {
+	}
+
 	public UserLoginValidation(String userEmail, String userPassword) {
-		super();
+
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
 	}
