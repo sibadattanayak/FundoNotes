@@ -2,23 +2,23 @@ package com.bridgelabz.fundonotes.service;
 
 import java.util.List;
 
-import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
-import com.bridgelabz.fundonotes.dto.UserDataValidation;
-import com.bridgelabz.fundonotes.dto.UserLoginValidation;
-import com.bridgelabz.fundonotes.model.UserDetails;
+import com.bridgelabz.fundonotes.dto.UserResetPasswordDTO;
+import com.bridgelabz.fundonotes.dto.UserInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserLoginDTO;
+import com.bridgelabz.fundonotes.model.UserDetailsModel;
 
 public interface User {
 
-	UserDetails userRegistration(UserDataValidation userDataValidation);
+	UserDetailsModel userRegistration(UserInfoDTO userInfoDTO);
 
-	String userLogin(UserLoginValidation loginDto);
+	String userLogin(UserLoginDTO loginDto);
 
 	String userForgotPassword(String email);
 
-	String userResetPassword(ResetPasswordDTO password, String token);
+	String userResetPassword(UserResetPasswordDTO password, String token);
 
 	String userVarification(String token);
 
-	List<UserDetails> showUserList(String token);
+	List<UserDetailsModel> showUserList(String token);
 
 }

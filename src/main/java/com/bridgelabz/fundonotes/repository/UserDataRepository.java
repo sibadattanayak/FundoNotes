@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.bridgelabz.fundonotes.model.UserDetails;
+import com.bridgelabz.fundonotes.model.UserDetailsModel;
 
 @Repository
-public interface UserDataRepository extends JpaRepository<UserDetails, Long> {
+public interface UserDataRepository extends JpaRepository<UserDetailsModel, Long> {
 
-	Optional<UserDetails> findByEmail(String email);
+	Optional<UserDetailsModel> findByEmail(String email);
 
 }

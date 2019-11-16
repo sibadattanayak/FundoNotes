@@ -19,16 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.fundonotes.dto.ForgetPasswordDTO;
-import com.bridgelabz.fundonotes.dto.ResetPasswordDTO;
-import com.bridgelabz.fundonotes.dto.UserDataValidation;
-import com.bridgelabz.fundonotes.dto.UserLoginValidation;
-import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
-import com.bridgelabz.fundonotes.dto.UserNoteValidation;
-import com.bridgelabz.fundonotes.model.UserDetails;
-import com.bridgelabz.fundonotes.model.UserNoteLabel;
-import com.bridgelabz.fundonotes.model.UserNotes;
+import com.bridgelabz.fundonotes.dto.UserForgetPasswordDTO;
+import com.bridgelabz.fundonotes.dto.UserResetPasswordDTO;
+import com.bridgelabz.fundonotes.dto.UserInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserLoginDTO;
+import com.bridgelabz.fundonotes.dto.UserNoteLabelInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserNoteInfoDTO;
+import com.bridgelabz.fundonotes.model.UserDetailsModel;
+import com.bridgelabz.fundonotes.model.LabelModel;
+import com.bridgelabz.fundonotes.model.NoteModel;
 import com.bridgelabz.fundonotes.response.ApplicationResponse;
+import com.bridgelabz.fundonotes.service.ElasticSearchService;
 import com.bridgelabz.fundonotes.service.Label;
 import com.bridgelabz.fundonotes.service.Note;
 import com.bridgelabz.fundonotes.service.User;
@@ -39,42 +40,41 @@ import com.bridgelabz.fundonotes.service.User;
 public class UserController {
 
 	@Autowired
-	private User userService;
+	private User userService = null;
 	@Autowired
-	private Note noteService;
+	private Note noteService = null;
 	@Autowired
-	private Label labelService;
-	/*
-	 * @Autowired private ElasticSearchServiceImpl elasticService;
-	 */
-	private UserDetails userDetails;
+	private Label labelService = null;
+
+	@Autowired
+	private ElasticSearchService elasticService;
+
+	private UserDetailsModel userDetailsModel = null;
 	private String data = null;
 
 	// ,consumes = { "application/json" }, produces = { "application/json" }
 
 	@PostMapping(value = "/login")
-	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginValidation loginDto) {
-		
+	public ResponseEntity<ApplicationResponse> login(@RequestBody UserLoginDTO loginDto) {
 		data = userService.userLogin(loginDto);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PostMapping(value = "/registration")
-	public ResponseEntity<ApplicationResponse> registration(@RequestBody UserDataValidation userDataValidation) {
-		
-		userDetails = userService.userRegistration(userDataValidation);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), userDetails));
+	public ResponseEntity<ApplicationResponse> registration(@RequestBody UserInfoDTO userInfoDTO) {
+		userDetailsModel = userService.userRegistration(userInfoDTO);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(new ApplicationResponse(HttpStatus.OK.value(), userDetailsModel));
 	}
 
 	@PutMapping(value = "/forgotpassword")
-	public ResponseEntity<ApplicationResponse> userForgotPassword(@RequestBody ForgetPasswordDTO forgetPasswordto) {
+	public ResponseEntity<ApplicationResponse> userForgotPassword(@RequestBody UserForgetPasswordDTO forgetPasswordto) {
 		data = userService.userForgotPassword(forgetPasswordto.getEmail());
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
 	}
 
 	@PutMapping(value = "/resetpassword")
-	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody ResetPasswordDTO password,
+	public ResponseEntity<ApplicationResponse> userResetPassword(@RequestBody UserResetPasswordDTO password,
 			@RequestHeader String token) {
 		data = userService.userResetPassword(password, token);
 		return ResponseEntity.status(HttpStatus.OK).body(new ApplicationResponse(HttpStatus.OK.value(), data));
@@ -86,172 +86,151 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/createnote")
-
-	public ResponseEntity<List<UserNotes>> createNote(@RequestBody UserNoteValidation userNoteDto,
+	public ResponseEntity<List<NoteModel>> createNote(@RequestBody UserNoteInfoDTO userNoteDto,
 			@RequestHeader String token) {
-		List<UserNotes> userNote = noteService.createNote(userNoteDto, token);
-		return new ResponseEntity<List<UserNotes>>(userNote, HttpStatus.CREATED);
+		List<NoteModel> userNote = noteService.createNote(userNoteDto, token);
+		return new ResponseEntity<List<NoteModel>>(userNote, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/updatenote")
+	public ResponseEntity<NoteModel> updateNote(@RequestBody NoteModel noteModel, @RequestHeader String token) {
 
-	public ResponseEntity<UserNotes> updateNote(@RequestBody UserNotes userNotes, @RequestHeader String token) {
-
-		UserNotes userNote = noteService.updateNote(userNotes, token);
-		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
+		NoteModel userNote = noteService.updateNote(noteModel, token);
+		return new ResponseEntity<NoteModel>(userNote, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/deletenote")
-
-	public ResponseEntity<UserNotes> deleteNote(@RequestParam Long noteId, @RequestHeader String token) {
-		UserNotes userNote = noteService.deleteNote(noteId, token);
-		return new ResponseEntity<UserNotes>(userNote, HttpStatus.OK);
+	public ResponseEntity<NoteModel> deleteNote(@RequestParam Long noteId, @RequestHeader String token) {
+		NoteModel userNote = noteService.deleteNote(noteId, token);
+		return new ResponseEntity<NoteModel>(userNote, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/createlabel")
-
-	public ResponseEntity<List<UserNoteLabel>> createLabel(@RequestParam UserNoteLabelValidation labelDto,
+	public ResponseEntity<List<LabelModel>> createLabel(@RequestParam UserNoteLabelInfoDTO labelDto,
 			@RequestHeader String token) {
-		List<UserNoteLabel> noteLabel = labelService.createLabel(labelDto, token);
-		return new ResponseEntity<List<UserNoteLabel>>(noteLabel, HttpStatus.CREATED);
+		List<LabelModel> noteLabel = labelService.createLabel(labelDto, token);
+		return new ResponseEntity<List<LabelModel>>(noteLabel, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/updatelabel")
-
-	public ResponseEntity<UserNoteLabel> updateLabel(@RequestParam UserNoteLabelValidation noteLabelValidation,
+	public ResponseEntity<LabelModel> updateLabel(@RequestParam UserNoteLabelInfoDTO noteLabelValidation,
 			@RequestHeader String token) {
-		UserNoteLabel noteLabel = labelService.updateLabel(noteLabelValidation, token);
-		return new ResponseEntity<UserNoteLabel>(noteLabel, HttpStatus.OK);
+		LabelModel noteLabel = labelService.updateLabel(noteLabelValidation, token);
+		return new ResponseEntity<LabelModel>(noteLabel, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/deletelabel")
-
 	public void deleteLabel(@RequestParam Long labelId, @RequestHeader String token) {
 		labelService.deleteLabel(labelId, token);
 	}
 
 	@PutMapping(value = "/pinned")
-
 	public ResponseEntity<Boolean> ifPinned(@RequestHeader String token, @RequestParam Long noteId) {
 		noteService.isPinned(token, noteId);
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/archive")
-
 	public ResponseEntity<Boolean> ifArchive(@RequestHeader String token, @RequestParam Long noteId) {
 		noteService.isArchive(token, noteId);
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/getarchivednotes")
-
-	public ResponseEntity<List<UserNotes>> getArchivedNotes(@RequestHeader String token) {
-		List<UserNotes> notes = noteService.getArchivedNotes(token);
-		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	public ResponseEntity<List<NoteModel>> getArchivedNotes(@RequestHeader String token) {
+		List<NoteModel> notes = noteService.getArchivedNotes(token);
+		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/trash")
-
 	public ResponseEntity<Boolean> ifTrash(@RequestParam Long noteId, @RequestHeader String token) {
 		noteService.isTrash(token, noteId);
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/gettrash")
-
-	public ResponseEntity<List<UserNotes>> getTrash(@RequestHeader String token) {
-		List<UserNotes> notes = noteService.getTrash(token);
-		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	public ResponseEntity<List<NoteModel>> getTrash(@RequestHeader String token) {
+		List<NoteModel> notes = noteService.getTrash(token);
+		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/reminder")
-
-	public ResponseEntity<UserNotes> updateReminder(
+	public ResponseEntity<NoteModel> updateReminder(
 			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime reminderDate,
 			@RequestHeader String token, @RequestParam Long noteId) {
-		UserNotes notes = noteService.updateReminder(reminderDate, token, noteId);
-		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
+		NoteModel notes = noteService.updateReminder(reminderDate, token, noteId);
+		return new ResponseEntity<NoteModel>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/getreminder")
-
-	public ResponseEntity<List<UserNotes>> getReminders(@RequestHeader String token) {
-		List<UserNotes> notes = noteService.getReminder(token);
-		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	public ResponseEntity<List<NoteModel>> getReminders(@RequestHeader String token) {
+		List<NoteModel> notes = noteService.getReminder(token);
+		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/showallusers")
-
-	public ResponseEntity<List<UserDetails>> getAllUserList(@RequestHeader String token) {
-		List<UserDetails> notes = userService.showUserList(token);
-		return new ResponseEntity<List<UserDetails>>(notes, HttpStatus.OK);
+	public ResponseEntity<List<UserDetailsModel>> getAllUserList(@RequestHeader String token) {
+		List<UserDetailsModel> notes = userService.showUserList(token);
+		return new ResponseEntity<List<UserDetailsModel>>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/showallnotes")
-
-	public ResponseEntity<List<UserNotes>> getAllNotes(@RequestHeader String token) {
-		List<UserNotes> notes = noteService.showNoteList(token);
-		return new ResponseEntity<List<UserNotes>>(notes, HttpStatus.OK);
+	public ResponseEntity<List<NoteModel>> getAllNotes(@RequestHeader String token) {
+		List<NoteModel> notes = noteService.showNoteList(token);
+		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/showalllabels")
-
-	public ResponseEntity<List<UserNoteLabel>> getAllLabelList(@RequestHeader String token) {
-		List<UserNoteLabel> labels = labelService.showLabelList(token);
-		return new ResponseEntity<List<UserNoteLabel>>(labels, HttpStatus.OK);
+	public ResponseEntity<List<LabelModel>> getAllLabelList(@RequestHeader String token) {
+		List<LabelModel> labels = labelService.showLabelList(token);
+		return new ResponseEntity<List<LabelModel>>(labels, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/addcollaborator")
-
-	public ResponseEntity<UserNoteLabel> addCollaborator(@RequestHeader String token, @RequestParam String email,
+	public ResponseEntity<LabelModel> addCollaborator(@RequestHeader String token, @RequestParam String email,
 			@RequestParam Long noteId) {
 		noteService.addCollaborater(token, email, noteId);
-		return new ResponseEntity<UserNoteLabel>(HttpStatus.OK);
+		return new ResponseEntity<LabelModel>(HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/removecollaborator")
-
-	public ResponseEntity<UserNoteLabel> removeCollaborator(@RequestHeader String token, @RequestParam String email,
+	public ResponseEntity<LabelModel> removeCollaborator(@RequestHeader String token, @RequestParam String email,
 			@RequestParam Long noteId) {
 		noteService.removeCollaborater(token, email, noteId);
-		return new ResponseEntity<UserNoteLabel>(HttpStatus.OK);
+		return new ResponseEntity<LabelModel>(HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/changecolor/{color}")
-
-	public ResponseEntity<UserNotes> updateColor(@PathVariable("color") String color, @RequestParam Long noteId,
+	public ResponseEntity<NoteModel> updateColor(@PathVariable("color") String color, @RequestParam Long noteId,
 			@RequestHeader String token) {
-		UserNotes notes = noteService.updateColor(color, token, noteId);
-		return new ResponseEntity<UserNotes>(notes, HttpStatus.OK);
+		NoteModel notes = noteService.updateColor(color, token, noteId);
+		return new ResponseEntity<NoteModel>(notes, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/showallcolabrators")
-
 	public ResponseEntity<List<String>> colabratorList(@RequestParam Long noteId, @RequestHeader String token) {
 		List<String> collaboratedUsers = noteService.getAllCollaborators(noteId, token);
 		return new ResponseEntity<List<String>>(collaboratedUsers, HttpStatus.OK);
 	}
 
 	@GetMapping("/getNotesOnLabel")
-	public List<UserNotes> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token) {
+	public List<NoteModel> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token) {
 		System.out.println(labelId + "     ");
-		List<UserNotes> notes = noteService.getNotesOnLabel(labelId, token);
+		List<NoteModel> notes = noteService.getNotesOnLabel(labelId, token);
 		return notes;
 	}
 
 	@PostMapping("/mappingNoteLabel")
 	public ResponseEntity<ApplicationResponse> listLabel(@RequestParam Long noteId,
-			@RequestBody UserNoteLabelValidation labeldto, @RequestHeader String token) {
+			@RequestBody UserNoteLabelInfoDTO labeldto, @RequestHeader String token) {
 		String status = noteService.listLabel(token, noteId, labeldto);
 		ApplicationResponse response = new ApplicationResponse(HttpStatus.ACCEPTED.value(), status);
 		return new ResponseEntity<ApplicationResponse>(response, HttpStatus.OK);
 	}
 
-	/*
-	 * @GetMapping("/search_note") public List<UserNotes>
-	 * searchNoteByData(@RequestParam String data) { return
-	 * elasticService.searchNoteByData(data); }
-	 */
+	@GetMapping("/searchnote")
+	public List<NoteModel> searchNoteByData(@RequestParam String data) {
+		return elasticService.searchNoteByData(data);
+	}
 
 }

@@ -2,33 +2,17 @@ package com.bridgelabz.fundonotes.dto;
 
 import java.time.LocalDateTime;
 
-public class UserNoteValidation {
+public class UserNoteInfoDTO {
 
-	
 	private String noteDescription;
 	private String noteTitle;
 	private LocalDateTime reminder;
 	private boolean isTrace;
-	public UserNoteValidation(String noteDescription, String noteTitle, LocalDateTime reminder, boolean isTrace,
-			boolean isArcive, boolean isPinned, String color) {
-		
-		this.noteDescription = noteDescription;
-		this.noteTitle = noteTitle;
-		this.reminder = reminder;
-		this.isTrace = isTrace;
-		this.isArcive = isArcive;
-		this.isPinned = isPinned;
-		this.color = color;
-	}
-
-	public UserNoteValidation() {
-		
-		
-	}
-
 	private boolean isArcive;
 	private boolean isPinned;
 	private String color;
+	
+	
 
 	public String getColor() {
 		return color;
@@ -45,7 +29,6 @@ public class UserNoteValidation {
 	public void setNoteTitle(String noteTitle) {
 		this.noteTitle = noteTitle;
 	}
-
 
 	public String getNoteDescription() {
 		return noteDescription;
@@ -85,6 +68,23 @@ public class UserNoteValidation {
 
 	public void setPinned(boolean isPinned) {
 		this.isPinned = isPinned;
+	}
+	
+	
+	public UserNoteInfoDTO() {
+		
+	}
+	
+	public UserNoteInfoDTO(String noteDescription, String noteTitle, LocalDateTime reminder, boolean isTrace,
+			boolean isArcive, boolean isPinned, String color) {
+		
+		this.noteDescription = noteDescription;
+		this.noteTitle = noteTitle;
+		this.reminder = reminder;
+		this.isTrace = isTrace;
+		this.isArcive = isArcive;
+		this.isPinned = isPinned;
+		this.color = color;
 	}
 
 }

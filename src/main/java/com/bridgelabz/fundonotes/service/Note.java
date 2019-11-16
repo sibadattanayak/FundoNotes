@@ -3,20 +3,20 @@ package com.bridgelabz.fundonotes.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.bridgelabz.fundonotes.dto.UserLoginValidation;
-import com.bridgelabz.fundonotes.dto.UserNoteLabelValidation;
-import com.bridgelabz.fundonotes.dto.UserNoteValidation;
-import com.bridgelabz.fundonotes.model.UserNotes;
+import com.bridgelabz.fundonotes.dto.UserLoginDTO;
+import com.bridgelabz.fundonotes.dto.UserNoteLabelInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserNoteInfoDTO;
+import com.bridgelabz.fundonotes.model.NoteModel;
 
 public interface Note {
 
-	List<UserNotes> createNote(UserNoteValidation userNoteDto, String token);
+	List<NoteModel> createNote(UserNoteInfoDTO userNoteDto, String token);
 
-	UserNotes updateNote(UserNotes userNotes, String token);
+	NoteModel updateNote(NoteModel noteModel, String token);
 
-	UserNotes deleteNote(Long noteId, String token);
+	NoteModel deleteNote(Long noteId, String token);
 
-	List<UserNotes> showNoteList(String token);
+	List<NoteModel> showNoteList(String token);
 
 	Boolean isPinned(String token, Long noteId);
 
@@ -24,24 +24,24 @@ public interface Note {
 
 	Boolean isTrash(String token, Long noteId);
 
-	UserNotes updateReminder(LocalDateTime reminderDate, String token, Long noteId);
+	NoteModel updateReminder(LocalDateTime reminderDate, String token, Long noteId);
 
 	String addCollaborater(String token, String email, Long noteId);
 
 	String removeCollaborater(String token, String email, Long noteId);
 
-	UserNotes updateColor(String color, String token, Long noteId);
+	NoteModel updateColor(String color, String token, Long noteId);
 
-	List<UserNotes> getReminder(String token);
+	List<NoteModel> getReminder(String token);
 
-	List<UserNotes> getTrash(String token);
+	List<NoteModel> getTrash(String token);
 
-	List<UserNotes> getArchivedNotes(String token);
+	List<NoteModel> getArchivedNotes(String token);
 
 	List<String> getAllCollaborators(Long noteId, String token);
 
-	List<UserNotes> getNotesOnLabel(Long labelId, String token);
+	List<NoteModel> getNotesOnLabel(Long labelId, String token);
 
-	public String listLabel(String token, Long noteId, UserNoteLabelValidation labeldto);
+	public String listLabel(String token, Long noteId, UserNoteLabelInfoDTO labeldto);
 
 }

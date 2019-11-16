@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonotes.dto;
 
-public class UserNoteLabelValidation {
+public class UserNoteLabelInfoDTO {
 
 	private String labelName;
 
@@ -12,12 +12,13 @@ public class UserNoteLabelValidation {
 		this.labelName = labelName;
 	}
 
-	public UserNoteLabelValidation() {
+	public UserNoteLabelInfoDTO() {
 		
 	}
 	
-	public UserNoteLabelValidation(String labelName) {
+	public UserNoteLabelInfoDTO(String labelName) {
 	
 		this.labelName = labelName;
 	}
+	
 }

@@ -21,29 +21,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NotNull
 @Entity
 @Table(name = "User_Details")
-public class UserDetails {
+public class UserDetailsModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "User_Id")
 	private Long userId;
-
-	public UserDetails(Long userId, String firstName, String lastName, String email, String password,
-			LocalDateTime createTime, LocalDateTime updateTime, boolean isVarified, List<UserNotes> notesList,
-			List<UserNoteLabel> labelList, List<UserNotes> collabratorNoteList) {
-
-		this.userId = userId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.password = password;
-		this.createTime = createTime;
-		this.updateTime = updateTime;
-		this.isVarified = isVarified;
-		this.notesList = notesList;
-		this.labelList = labelList;
-		this.collabratorNoteList = collabratorNoteList;
-	}
 
 	@Column(name = "FirstName", nullable = false)
 	private String firstName;
@@ -56,7 +39,8 @@ public class UserDetails {
 	private String email;
 
 	/*
-	 * @Pattern.List({ @Pattern(regexp = "(?=.*[0-9])", message = "Password must contain one digit.")
+	 * @Pattern.List({ @Pattern(regexp = "(?=.*[0-9])", message =
+	 * "Password must contain one digit.")
 	 */
 
 	// @Size(min = 3, max = 10, message = "Password Length must be between 3 to 10")
@@ -75,22 +59,16 @@ public class UserDetails {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Column(nullable = false)
 	@JoinColumn(name = "User_Id")
-	private List<UserNotes> notesList = new ArrayList<UserNotes>();
+	private List<NoteModel> notesList = new ArrayList<NoteModel>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@Column(nullable = false)
 	@JoinColumn(name = "User_Id")
-	private List<UserNoteLabel> labelList = new ArrayList<UserNoteLabel>();
+	private List<LabelModel> labelList = new ArrayList<LabelModel>();
 
 	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "collabratorUserList")
 	@JsonIgnore
-	private List<UserNotes> collabratorNoteList;
-	
-	
-	public UserDetails() {
-		this.collabratorNoteList = new ArrayList<>();
-		// TODO Auto-generated constructor stub
-	}
+	private List<NoteModel> collabratorNoteList;
 
 	public void setIsVarified(boolean isVarified) {
 		this.isVarified = isVarified;
@@ -160,36 +138,57 @@ public class UserDetails {
 		this.isVarified = isVarified;
 	}
 
-	public List<UserNotes> getCollabratorNoteList() {
+	public List<NoteModel> getCollabratorNoteList() {
 		return collabratorNoteList;
 	}
 
-	public void setCollabratorNoteList(List<UserNotes> collabratorNoteList) {
+	public void setCollabratorNoteList(List<NoteModel> collabratorNoteList) {
 		this.collabratorNoteList = collabratorNoteList;
 	}
 
-	public List<UserNotes> getNotes() {
+	public List<NoteModel> getNotes() {
 		return notesList;
 	}
 
-	public List<UserNotes> getNotesList() {
+	public List<NoteModel> getNotesList() {
 		return notesList;
 	}
 
-	public void setNotesList(List<UserNotes> notesList) {
+	public void setNotesList(List<NoteModel> notesList) {
 		this.notesList = notesList;
 	}
 
-	public List<UserNoteLabel> getLabelList() {
+	public List<LabelModel> getLabelList() {
 		return labelList;
 	}
 
-	public void setLabelList(List<UserNoteLabel> labelList) {
+	public void setLabelList(List<LabelModel> labelList) {
 		this.labelList = labelList;
 	}
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public UserDetailsModel() {
+		// this.collabratorNoteList = new ArrayList<>();
+	}
+
+	public UserDetailsModel(Long userId, String firstName, String lastName, String email, String password,
+			LocalDateTime createTime, LocalDateTime updateTime, boolean isVarified, List<NoteModel> notesList,
+			List<LabelModel> labelList, List<NoteModel> collabratorNoteList) {
+
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.isVarified = isVarified;
+		this.notesList = notesList;
+		this.labelList = labelList;
+		this.collabratorNoteList = collabratorNoteList;
 	}
 
 }

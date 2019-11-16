@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "User_Note_Label")
-public class UserNoteLabel {
+public class LabelModel {
 	@Id
 	@Column(name = "label_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)

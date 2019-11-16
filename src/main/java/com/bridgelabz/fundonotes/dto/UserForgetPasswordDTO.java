@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonotes.dto;
 
-public class ForgetPasswordDTO {
+public class UserForgetPasswordDTO {
 	private String email;
 
 	public String getEmail() {
@@ -8,6 +8,13 @@ public class ForgetPasswordDTO {
 	}
 
 	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public UserForgetPasswordDTO() {
+	}
+
+	public UserForgetPasswordDTO(String email) {
 		this.email = email;
 	}
 

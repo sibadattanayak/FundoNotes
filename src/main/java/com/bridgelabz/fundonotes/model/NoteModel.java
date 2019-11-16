@@ -20,10 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NotNull
 @Entity
 @Table(name = "User_Notes")
-public class UserNotes {
-	public UserNotes(Long id, String color, String noteDescription, String noteTitle, LocalDateTime noteCreateTime,
+public class NoteModel {
+	public NoteModel(Long id, String color, String noteDescription, String noteTitle, LocalDateTime noteCreateTime,
 			LocalDateTime noteUpdateTime, LocalDateTime reminder, boolean isTrace, boolean isArchive, boolean isPinned,
-			List<UserNoteLabel> label, List<UserDetails> collabratorUserList) {
+			List<LabelModel> label, List<UserDetailsModel> collabratorUserList) {
 		super();
 		this.id = id;
 		this.color = color;
@@ -154,13 +154,13 @@ public class UserNotes {
 	
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "UserNote_Id")
-	private List<UserNoteLabel> label;
+	private List<LabelModel> label;
 
-	public List<UserNoteLabel> getLabel() {
+	public List<LabelModel> getLabel() {
 		return label;
 	}
 
-	public void setLabel(List<UserNoteLabel> label) {
+	public void setLabel(List<LabelModel> label) {
 		this.label = label;
 	}
 
@@ -175,13 +175,13 @@ public class UserNotes {
 	 */
 	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<UserDetails> collabratorUserList;
+	private List<UserDetailsModel> collabratorUserList;
 
-	public List<UserDetails> getCollabratorUserList() {
+	public List<UserDetailsModel> getCollabratorUserList() {
 		return collabratorUserList;
 	}
 
-	public void setCollabratorUserList(List<UserDetails> collabratorUserList) {
+	public void setCollabratorUserList(List<UserDetailsModel> collabratorUserList) {
 		this.collabratorUserList = collabratorUserList;
 	}
 
