@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -21,23 +22,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "User_Notes")
 public class NoteModel {
-	public NoteModel(Long id, String color, String noteDescription, String noteTitle, LocalDateTime noteCreateTime,
-			LocalDateTime noteUpdateTime, LocalDateTime reminder, boolean isTrace, boolean isArchive, boolean isPinned,
-			List<LabelModel> label, List<UserDetailsModel> collabratorUserList) {
-		super();
-		this.id = id;
-		this.color = color;
-		this.noteDescription = noteDescription;
-		this.noteTitle = noteTitle;
-		this.noteCreateTime = noteCreateTime;
-		this.noteUpdateTime = noteUpdateTime;
-		this.reminder = reminder;
-		this.isTrace = isTrace;
-		this.isArchive = isArchive;
-		this.isPinned = isPinned;
-		this.label = label;
-		this.collabratorUserList = collabratorUserList;
-	}
 
 	@Id
 	@Column(name = "UserNote_Id")
@@ -45,14 +29,6 @@ public class NoteModel {
 	private Long id;
 
 	private String color;
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
 
 	@Column(name = "UserNote_Description")
 	private String noteDescription;
@@ -77,6 +53,18 @@ public class NoteModel {
 
 	@Column(name = "UserNote_isPinned")
 	private boolean isPinned;
+
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "UserNote_Id")
+	private List<LabelModel> label = new ArrayList<LabelModel>();
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
 
 	public Long getId() {
 		return id;
@@ -150,12 +138,6 @@ public class NoteModel {
 		this.isPinned = isPinned;
 	}
 
-	
-	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "UserNote_Id")
-	private List<LabelModel> label;
-
 	public List<LabelModel> getLabel() {
 		return label;
 	}
@@ -164,7 +146,6 @@ public class NoteModel {
 		this.label = label;
 	}
 
-	
 	/*
 	 * @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	 * 
@@ -191,4 +172,25 @@ public class NoteModel {
 	 * public void setNotesList(List<UserDetails> notesList) { this.notesList =
 	 * notesList; }
 	 */
+
+	public NoteModel() {
+	}
+
+	public NoteModel(Long id, String color, String noteDescription, String noteTitle, LocalDateTime noteCreateTime,
+			LocalDateTime noteUpdateTime, LocalDateTime reminder, boolean isTrace, boolean isArchive, boolean isPinned,
+			List<LabelModel> label, List<UserDetailsModel> collabratorUserList) {
+		
+		this.id = id;
+		this.color = color;
+		this.noteDescription = noteDescription;
+		this.noteTitle = noteTitle;
+		this.noteCreateTime = noteCreateTime;
+		this.noteUpdateTime = noteUpdateTime;
+		this.reminder = reminder;
+		this.isTrace = isTrace;
+		this.isArchive = isArchive;
+		this.isPinned = isPinned;
+		this.label = label;
+		this.collabratorUserList = collabratorUserList;
+	}
 }

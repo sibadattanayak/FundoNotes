@@ -14,5 +14,7 @@ public interface Label {
 	void deleteLabel(Long labelId, String token);
 
 	List<LabelModel> showLabelList(String token);
+	
+	LabelModel updateLabel(UserNoteLabelInfoDTO labelDto, Long labelId, String token);
 
 }

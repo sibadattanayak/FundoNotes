@@ -18,15 +18,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bridgelabz.fundonotes.configuration.RabitMqConfig;
-import com.bridgelabz.fundonotes.dto.UserResetPasswordDTO;
 import com.bridgelabz.fundonotes.dto.UserInfoDTO;
 import com.bridgelabz.fundonotes.dto.UserLoginDTO;
-import com.bridgelabz.fundonotes.dto.UserNoteLabelInfoDTO;
 import com.bridgelabz.fundonotes.dto.UserNoteInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserNoteLabelInfoDTO;
+import com.bridgelabz.fundonotes.dto.UserResetPasswordDTO;
 import com.bridgelabz.fundonotes.exception.CustomException;
-import com.bridgelabz.fundonotes.model.UserDetailsModel;
 import com.bridgelabz.fundonotes.model.LabelModel;
 import com.bridgelabz.fundonotes.model.NoteModel;
+import com.bridgelabz.fundonotes.model.UserDetailsModel;
 import com.bridgelabz.fundonotes.repository.UserDataRepository;
 import com.bridgelabz.fundonotes.repository.UserNoteLabelRepository;
 import com.bridgelabz.fundonotes.repository.UserNoteRepository;
@@ -40,30 +40,25 @@ import com.bridgelabz.fundonotes.util.Utility;
 public class UserServiceImplementation implements Label, User, Note {
 
 	@Autowired
-	private UserDataRepository userDataRepository;
+	private UserDataRepository userDataRepository = null;
 	@Autowired
-	private ModelMapper modelMapper;
+	private ModelMapper modelMapper = null;
 	@Autowired
-	private Utility util;
+	private Utility util = null;
 	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-	private UserNoteRepository userNoteRepository;
+	private BCryptPasswordEncoder bCryptPasswordEncoder = null;
 	@Autowired
-	private RabbitTemplate rabbitTemplate;
+	private UserNoteRepository userNoteRepository = null;
 	@Autowired
-	private RedisTemplate<Object, Object> redisTemplate;
-	
+	private RabbitTemplate rabbitTemplate = null;
 	@Autowired
-	private Label labelService;
-
-	private UserNoteLabelRepository labelRepository;
+	private RedisTemplate<Object, Object> redisTemplate = null;
 
 	@Autowired
-	private ElasticSearchServiceImpl elasticSearchService;
+	private UserNoteLabelRepository labelRepository = null;
 
-	private UserDetailsModel userDetailsModel;
-	private UserNoteInfoDTO userNoteInfoDTO;
+	@Autowired
+	private ElasticSearchServiceImpl elasticSearchService = null;
 
 	private String message = null;
 
@@ -75,23 +70,24 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
-
+	@Transactional
 	public String addCollaborater(String token, String email, Long noteId) {
 		Long userId = util.jwtTokenParser(token);
 
 		if (userId.equals(null)) {
-			throw new CustomException(400, "User not found 1");
+			logger.error("User not found with id>> "+userId);
+			throw new CustomException(400, "User not found");
 		}
 		Optional<UserDetailsModel> user = userDataRepository.findById(userId);
 		Optional<UserDetailsModel> checkUser = userDataRepository.findByEmail(email);
 
 		if (!checkUser.isPresent()) {
-			throw new CustomException(400, "User not found 2");
+			throw new CustomException(400, "Collaborating email not found");
 		}
 		Optional<NoteModel> checkNote = user.get().getNotesList().stream().filter(data -> data.getId() == noteId)
 				.findFirst();
 		if (!checkNote.isPresent()) {
-			throw new CustomException(400, "User not found 4");
+			throw new CustomException(400, "Note not found ");
 		}
 		Optional<NoteModel> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
@@ -113,20 +109,20 @@ public class UserServiceImplementation implements Label, User, Note {
 		Long userId = util.jwtTokenParser(token);
 
 		if (userId.equals(null)) {
-			throw new CustomException(400, "User not found 1");
+			throw new CustomException(400, "User not found");
 		}
 		Optional<UserDetailsModel> user = userDataRepository.findById(userId);
 		Optional<UserDetailsModel> checkUser = userDataRepository.findByEmail(email);
 
 		if (!checkUser.isPresent()) {
-			throw new CustomException(400, "collaborated user not found 2");
+			throw new CustomException(400, "collaborated user not found ");
 		}
 		Optional<NoteModel> notePresent = userNoteRepository.findById(noteId);
 
 		Optional<NoteModel> collaboratedNote = checkUser.get().getCollabratorNoteList().stream()
 				.filter(data -> data.getId() == noteId).findFirst();
 		if (!collaboratedNote.isPresent()) {
-			throw new CustomException(400, "collaborated note  not found 4");
+			throw new CustomException(400, "collaborated note  not found ");
 		}
 		notePresent.get().getCollabratorUserList().remove(checkUser.get());
 		checkUser.get().getCollabratorNoteList().remove(collaboratedNote.get());
@@ -147,10 +143,9 @@ public class UserServiceImplementation implements Label, User, Note {
 			userDetailsModel.setPassword(bCryptPasswordEncoder.encode(userDetailsModel.getPassword()));
 			userDetailsModel.setCreateTime(LocalDateTime.now());
 			userDetailsModel.setUpdateTime(LocalDateTime.now());
-			userDetailsModel.setVarified(false);
+			userDetailsModel.setVarified(true);
 
 			UserDetailsModel userDetails1 = userDataRepository.save(userDetailsModel);
-			System.out.println("reg2: " + userDetailsModel);
 			logger.info("User Registered Successfully");
 			String token = null;
 			if (userDetails1 != null) {
@@ -193,11 +188,7 @@ public class UserServiceImplementation implements Label, User, Note {
 	@Transactional
 	public String userLogin(UserLoginDTO loginDto) {
 		String token = null;
-		System.out.println(
-				"inside serviceimpl  method1 : " + loginDto.getUserEmail() + " : " + loginDto.getUserPassword());
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findByEmail(loginDto.getUserEmail());
-		System.out.println(
-				"inside serviceimpl  method2 : " + loginDto.getUserEmail() + " : " + loginDto.getUserPassword());
 
 		if (!userDetailsModel.isPresent()) {
 			logger.info("Login attempted with unregistered email --> " + loginDto.getUserEmail());
@@ -311,6 +302,28 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	@Override
+	public String updateNoteReact(Long id, UserNoteInfoDTO noteModel, String token) {
+		Long userId = util.jwtTokenParser(token);
+		Optional<UserDetailsModel> userDetails = userDataRepository.findById(userId);
+		Optional<NoteModel> note = null;
+		if (userDetails.isPresent()) {
+			note = userNoteRepository.findById(id);
+			if (note.isPresent() && userDetails.get().isVarified()) {
+				note.get().setNoteTitle(noteModel.getNoteTitle());
+				note.get().setNoteDescription(noteModel.getNoteDescription());
+				note.get().setNoteUpdateTime(LocalDateTime.now());
+				userNoteRepository.save(note.get());
+				elasticSearchService.updateNote(note.get());
+			} else
+				throw new CustomException(104, "Invalid token or user not verified");
+		} else
+			throw new CustomException(102, "User not exist");
+
+		return "update note";
+
+	}
+
+	@Override
 	public NoteModel deleteNote(Long noteId, String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
@@ -321,7 +334,6 @@ public class UserServiceImplementation implements Label, User, Note {
 			if (notes.isPresent() && userDetailsModel.get().isVarified()) {
 				userNoteRepository.deleteById(noteId);
 				logger.info("User note deleted successfully");
-				// elasticSearchService.deleteNote(notes.get());
 			} else {
 				logger.info("User not found or invalid token");
 				throw new CustomException(104, "Invalid token or user not found");
@@ -371,6 +383,26 @@ public class UserServiceImplementation implements Label, User, Note {
 			logger.info("User not found");
 			throw new CustomException(400, "User not found");
 		}
+	}
+
+	@Override
+	public LabelModel updateLabel(UserNoteLabelInfoDTO labelDto, Long labelId, String token) {
+		Long userId = util.jwtTokenParser(token);
+		LabelModel labelData = null;
+		if (userId != null) {
+			Optional<UserDetailsModel> userDetails = userDataRepository.findById(userId);
+			if (userDetails.isPresent() && userDetails.get().isVarified()) {
+				Optional<LabelModel> label = labelRepository.findById(labelId);
+				if (label.isPresent()) {
+					labelData = label.get();
+					labelData.setLabelName(labelDto.getLabelName());
+					labelData = labelRepository.save(labelData);
+				}
+				// throw exception
+			}
+			// throw exception
+		}
+		return labelData;
 	}
 
 	@Override
@@ -449,7 +481,6 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public Boolean isTrash(String token, Long noteId) {
-
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
 		NoteModel userNote = null;
@@ -503,7 +534,6 @@ public class UserServiceImplementation implements Label, User, Note {
 			if (userDetailsModel.get().isVarified()) {
 				notes = userDetailsModel.get().getNotes().stream().filter(data -> !data.isArchive() && !data.isTrace())
 						.collect(Collectors.toList());
-
 			} else
 				throw new CustomException(104, "Invalid token or user not verified");
 		} else
@@ -581,10 +611,11 @@ public class UserServiceImplementation implements Label, User, Note {
 
 	@Override
 	public NoteModel updateColor(String color, String token, Long noteId) {
-		System.out.println("color: " + color);
+
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
 		NoteModel userNote = null;
+
 		if (userDetailsModel.isPresent()) {
 			Optional<NoteModel> notes = userNoteRepository.findById(noteId);
 			if (notes.isPresent() && userDetailsModel.get().isVarified()) {
@@ -603,10 +634,10 @@ public class UserServiceImplementation implements Label, User, Note {
 	public List<NoteModel> getReminder(String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
-		Optional<NoteModel> notes = null;
+
 		List<NoteModel> notesList = null;
 		if (userDetailsModel.isPresent()) {
-			if (userDetailsModel.get().isVarified() && notes.get().getReminder() != null) {
+			if (userDetailsModel.get().isVarified()) {
 				notesList = userDetailsModel.get().getNotes();
 				notesList = notesList.stream().filter(notecheck -> notecheck.getReminder() != null)
 						.collect(Collectors.toList());
@@ -621,7 +652,6 @@ public class UserServiceImplementation implements Label, User, Note {
 	public List<NoteModel> getTrash(String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
-		Optional<NoteModel> notes = null;
 		List<NoteModel> notesList = null;
 		if (userDetailsModel.isPresent()) {
 			if (userDetailsModel.get().isVarified()) {
@@ -638,7 +668,6 @@ public class UserServiceImplementation implements Label, User, Note {
 	public List<NoteModel> getArchivedNotes(String token) {
 		Long userId = util.jwtTokenParser(token);
 		Optional<UserDetailsModel> userDetailsModel = userDataRepository.findById(userId);
-		Optional<NoteModel> notes = null;
 		List<NoteModel> notesList = null;
 		if (userDetailsModel.isPresent()) {
 			if (userDetailsModel.get().isVarified()) {
@@ -667,41 +696,35 @@ public class UserServiceImplementation implements Label, User, Note {
 	}
 
 	private List<NoteModel> getMultipleNotesOfLabel(Long labelId) {
-		ArrayList<NoteModel> notes1 = new ArrayList<NoteModel>();
-		List<Long> noteIds = labelRepository.findByLabelId(labelId);
-		if (!noteIds.isEmpty()) {
-			for (Long noteId : noteIds) {
-				System.out.println(noteId);
-				Optional<NoteModel> note = userNoteRepository.findById(noteId);
-				notes1.add(note.get());
+		ArrayList<NoteModel> noteData = new ArrayList<NoteModel>();
+		List<Long> noteByLabel = labelRepository.findByLabelId(labelId);
+		if (!noteByLabel.isEmpty()) {
+			for (Long noteId : noteByLabel) {
+				Optional<NoteModel> noteById = userNoteRepository.findById(noteId);
+				noteData.add(noteById.get());
 			}
 		}
-		return notes1;
+		return noteData;
 	}
 
 	@Override
 	public String listLabel(String token, Long noteId, UserNoteLabelInfoDTO labelDto) {
 		Long verifiedUser = util.jwtTokenParser(token);
-		System.out.println("in service");
+
 		Optional<UserDetailsModel> userModel = userDataRepository.findById(verifiedUser);
+
 		if (userModel.isPresent()) {
-			System.out.println("in user present");
 			Optional<LabelModel> isLabelPresent = userModel.get().getLabelList().stream()
 					.filter(data -> data.getLabelName().equalsIgnoreCase(labelDto.getLabelName())).findFirst();
 			if (isLabelPresent.isPresent()) {
-				System.out.println("in label present");
 				Optional<NoteModel> noteModel = userNoteRepository.findById(noteId);
 				if (noteModel.isPresent()) {
-					System.out.println("in note present");
-
 					Optional<LabelModel> isnotelabelPresent = noteModel.get().getLabel().stream()
 							.filter(data -> data.getLabelName().equalsIgnoreCase(labelDto.getLabelName())).findFirst();
-
 					if (isnotelabelPresent.isPresent()) {
 						throw new CustomException(HttpStatus.BAD_REQUEST.value(), "label already exist");
 					}
 					noteModel.get().getLabel().add(isLabelPresent.get());
-
 					userNoteRepository.save(noteModel.get());
 					return "label added to note";
 				}

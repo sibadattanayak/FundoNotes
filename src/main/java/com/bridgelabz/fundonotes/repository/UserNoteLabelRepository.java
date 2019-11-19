@@ -11,6 +11,6 @@ import com.bridgelabz.fundonotes.model.LabelModel;
 public interface UserNoteLabelRepository extends JpaRepository<LabelModel, Long> {
 
 	
-	@Query(value="select user_notes_user_note_id from user_notes_label where label_label_id =?1" , nativeQuery=true)
+	@Query(value="select note_model_user_note_id from user_notes_label where label_label_id =?1" , nativeQuery=true)
 	List<Long> findByLabelId(Long labelId);
 }

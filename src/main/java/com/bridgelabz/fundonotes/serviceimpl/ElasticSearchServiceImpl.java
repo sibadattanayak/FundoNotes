@@ -36,10 +36,10 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
 	private static final String TYPE = "notes";
 
 	@Autowired
-	private RestHighLevelClient client;
+	private RestHighLevelClient client = null;
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	private ObjectMapper objectMapper = null;
 
 	@Override
 	public List<NoteModel> searchNoteByData(String searchData) {
@@ -47,9 +47,9 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		QueryBuilder queryBuilder = QueryBuilders.boolQuery()
 				.should(QueryBuilders.queryStringQuery(searchData).lenient(true).field("noteTitle")
-						.field("description"))
+						.field("noteDescription"))
 				.should(QueryBuilders.queryStringQuery("*" + searchData + "*").lenient(true).field("noteTitle")
-						.field("description"));
+						.field("noteDescription"));
 		searchRequest.source(searchSourceBuilder.query(queryBuilder));
 		SearchResponse response = new SearchResponse();
 		try {

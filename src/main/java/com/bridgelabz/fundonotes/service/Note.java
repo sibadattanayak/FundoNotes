@@ -13,6 +13,8 @@ public interface Note {
 	List<NoteModel> createNote(UserNoteInfoDTO userNoteDto, String token);
 
 	NoteModel updateNote(NoteModel noteModel, String token);
+	
+	String updateNoteReact(Long id,UserNoteInfoDTO noteModel,String token);
 
 	NoteModel deleteNote(Long noteId, String token);
 

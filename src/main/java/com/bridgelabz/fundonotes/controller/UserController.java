@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ import com.bridgelabz.fundonotes.service.User;
 
 @RestController
 @CrossOrigin(allowedHeaders = "*", origins = "*", exposedHeaders = { "jwtToken" })
+//@PropertySource("application.property")
 @RequestMapping("/fundonotes")
 public class UserController {
 
@@ -47,7 +49,7 @@ public class UserController {
 	private Label labelService = null;
 
 	@Autowired
-	private ElasticSearchService elasticService;
+	private ElasticSearchService elasticService = null;
 
 	private UserDetailsModel userDetailsModel = null;
 	private String data = null;
@@ -94,9 +96,15 @@ public class UserController {
 
 	@PutMapping(value = "/updatenote")
 	public ResponseEntity<NoteModel> updateNote(@RequestBody NoteModel noteModel, @RequestHeader String token) {
-
 		NoteModel userNote = noteService.updateNote(noteModel, token);
 		return new ResponseEntity<NoteModel>(userNote, HttpStatus.OK);
+	}
+
+	@PutMapping("/updatenotereact")
+	public ResponseEntity<String> updateNoteReact(@RequestParam Long id, @RequestBody UserNoteInfoDTO noteModel,
+			@RequestHeader String token) {
+		String result = noteService.updateNoteReact(id, noteModel, token);
+		return new ResponseEntity<String>(result, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/deletenote")
@@ -105,23 +113,56 @@ public class UserController {
 		return new ResponseEntity<NoteModel>(userNote, HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/showallnotes")
+	public ResponseEntity<List<NoteModel>> getAllNotes(@RequestHeader String token) {
+		List<NoteModel> notes = noteService.showNoteList(token);
+		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/createlabel")
-	public ResponseEntity<List<LabelModel>> createLabel(@RequestParam UserNoteLabelInfoDTO labelDto,
+	public ResponseEntity<List<LabelModel>> createLabel(@RequestBody UserNoteLabelInfoDTO labelDto,
 			@RequestHeader String token) {
 		List<LabelModel> noteLabel = labelService.createLabel(labelDto, token);
 		return new ResponseEntity<List<LabelModel>>(noteLabel, HttpStatus.CREATED);
 	}
 
-	@PutMapping(value = "/updatelabel")
-	public ResponseEntity<LabelModel> updateLabel(@RequestParam UserNoteLabelInfoDTO noteLabelValidation,
-			@RequestHeader String token) {
-		LabelModel noteLabel = labelService.updateLabel(noteLabelValidation, token);
-		return new ResponseEntity<LabelModel>(noteLabel, HttpStatus.OK);
+//	@PutMapping(value = "/updatelabel")
+//	public ResponseEntity<LabelModel> updateLabel(@RequestParam UserNoteLabelInfoDTO noteLabelValidation,
+//			@RequestHeader String token) {
+//		LabelModel noteLabel = labelService.updateLabel(noteLabelValidation, token);
+//		return new ResponseEntity<LabelModel>(noteLabel, HttpStatus.OK);
+//	}
+
+	@PutMapping("/updatelabel")
+	public ResponseEntity<LabelModel> updateLabel(@RequestParam Long labelId,
+			@RequestBody UserNoteLabelInfoDTO labelDto, @RequestHeader String token) {
+		LabelModel label = labelService.updateLabel(labelDto, labelId, token);
+		return new ResponseEntity<LabelModel>(label, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/deletelabel")
 	public void deleteLabel(@RequestParam Long labelId, @RequestHeader String token) {
 		labelService.deleteLabel(labelId, token);
+	}
+
+	@GetMapping(value = "/showalllabels")
+	public ResponseEntity<List<LabelModel>> getAllLabelList(@RequestHeader String token) {
+		List<LabelModel> labels = labelService.showLabelList(token);
+		return new ResponseEntity<List<LabelModel>>(labels, HttpStatus.OK);
+	}
+
+	@GetMapping("/getnotesonlabel")
+	public List<NoteModel> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token) {
+		List<NoteModel> notes = noteService.getNotesOnLabel(labelId, token);
+		return notes;
+	}
+
+	@PostMapping("/mappingnotelabel")
+	public ResponseEntity<ApplicationResponse> listLabel(@RequestParam Long noteId,
+			@RequestBody UserNoteLabelInfoDTO labeldto, @RequestHeader String token) {
+		String status = noteService.listLabel(token, noteId, labeldto);
+		ApplicationResponse response = new ApplicationResponse(HttpStatus.ACCEPTED.value(), status);
+		return new ResponseEntity<ApplicationResponse>(response, HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/pinned")
@@ -174,16 +215,11 @@ public class UserController {
 		return new ResponseEntity<List<UserDetailsModel>>(notes, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/showallnotes")
-	public ResponseEntity<List<NoteModel>> getAllNotes(@RequestHeader String token) {
-		List<NoteModel> notes = noteService.showNoteList(token);
-		return new ResponseEntity<List<NoteModel>>(notes, HttpStatus.OK);
-	}
-
-	@GetMapping(value = "/showalllabels")
-	public ResponseEntity<List<LabelModel>> getAllLabelList(@RequestHeader String token) {
-		List<LabelModel> labels = labelService.showLabelList(token);
-		return new ResponseEntity<List<LabelModel>>(labels, HttpStatus.OK);
+	@PutMapping(value = "/changecolor/{color}")
+	public ResponseEntity<NoteModel> updateColor(@PathVariable("color") String color, @RequestParam Long noteId,
+			@RequestHeader String token) {
+		NoteModel notes = noteService.updateColor(color, token, noteId);
+		return new ResponseEntity<NoteModel>(notes, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/addcollaborator")
@@ -200,32 +236,10 @@ public class UserController {
 		return new ResponseEntity<LabelModel>(HttpStatus.OK);
 	}
 
-	@PutMapping(value = "/changecolor/{color}")
-	public ResponseEntity<NoteModel> updateColor(@PathVariable("color") String color, @RequestParam Long noteId,
-			@RequestHeader String token) {
-		NoteModel notes = noteService.updateColor(color, token, noteId);
-		return new ResponseEntity<NoteModel>(notes, HttpStatus.OK);
-	}
-
 	@GetMapping(value = "/showallcolabrators")
 	public ResponseEntity<List<String>> colabratorList(@RequestParam Long noteId, @RequestHeader String token) {
 		List<String> collaboratedUsers = noteService.getAllCollaborators(noteId, token);
 		return new ResponseEntity<List<String>>(collaboratedUsers, HttpStatus.OK);
-	}
-
-	@GetMapping("/getNotesOnLabel")
-	public List<NoteModel> getNotesOnLabel(@RequestParam Long labelId, @RequestHeader String token) {
-		System.out.println(labelId + "     ");
-		List<NoteModel> notes = noteService.getNotesOnLabel(labelId, token);
-		return notes;
-	}
-
-	@PostMapping("/mappingNoteLabel")
-	public ResponseEntity<ApplicationResponse> listLabel(@RequestParam Long noteId,
-			@RequestBody UserNoteLabelInfoDTO labeldto, @RequestHeader String token) {
-		String status = noteService.listLabel(token, noteId, labeldto);
-		ApplicationResponse response = new ApplicationResponse(HttpStatus.ACCEPTED.value(), status);
-		return new ResponseEntity<ApplicationResponse>(response, HttpStatus.OK);
 	}
 
 	@GetMapping("/searchnote")

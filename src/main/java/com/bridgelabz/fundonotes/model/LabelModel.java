@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "User_Note_Label")
 public class LabelModel {
+
 	@Id
 	@Column(name = "label_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,6 +32,16 @@ public class LabelModel {
 	}
 
 	public void setLabelName(String labelName) {
+		this.labelName = labelName;
+	}
+
+	public LabelModel() {
+
+	}
+
+	public LabelModel(Long id, String labelName) {
+
+		this.id = id;
 		this.labelName = labelName;
 	}
 }
